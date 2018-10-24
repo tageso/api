@@ -47,25 +47,25 @@ class OrganisationCreateTest extends TestCase
         $apiKey->saveOrFail();
 
         $organisation = \App\Models\Organisations::query()
-            ->where("name", "=", "PHPUnit")
+            ->where("name", "=", "PHPUnit2")
             ->count();
 
         $this->assertEquals(0, $organisation);
 
 
-        $this->post("/v2/organisations", ["name" => "PHPUnit"], ["accept" => "application/json", "authorization" => "phpunit"]);
+        $this->post("/v2/organisations", ["name" => "PHPUnit2"], ["accept" => "application/json", "authorization" => "phpunit"]);
 
         $data = \GuzzleHttp\json_decode($this->response->getContent(), true);
 
         $organisations = \App\Models\Organisations::query()
-            ->where("name", "=", "PHPUnit")
+            ->where("name", "=", "PHPUnit2")
             ->get();
 
         $this->assertEquals(1, count($organisations));
 
         $organisation = $organisations[0];
 
-        $this->assertEquals("PHPUnit", $organisation->name);
+        $this->assertEquals("PHPUnit2", $organisation->name);
         $this->assertEquals(true, $organisation->public);
         $this->assertNull($organisation->url);
         $this->assertEquals("active", $organisation->status);
@@ -83,25 +83,25 @@ class OrganisationCreateTest extends TestCase
         $apiKey->saveOrFail();
 
         $organisation = \App\Models\Organisations::query()
-            ->where("name", "=", "PHPUnit")
+            ->where("name", "=", "PHPUnit3")
             ->count();
 
         $this->assertEquals(0, $organisation);
 
 
-        $this->post("/v2/organisations", ["name" => "PHPUnit", "url" => "phpunit"], ["accept" => "application/json", "authorization" => "phpunit"]);
+        $this->post("/v2/organisations", ["name" => "PHPUnit3", "url" => "phpunit"], ["accept" => "application/json", "authorization" => "phpunit"]);
 
         $data = \GuzzleHttp\json_decode($this->response->getContent(), true);
 
         $organisations = \App\Models\Organisations::query()
-            ->where("name", "=", "PHPUnit")
+            ->where("name", "=", "PHPUnit3")
             ->get();
 
         $this->assertEquals(1, count($organisations));
 
         $organisation = $organisations[0];
 
-        $this->assertEquals("PHPUnit", $organisation->name);
+        $this->assertEquals("PHPUnit3", $organisation->name);
         $this->assertEquals(true, $organisation->public);
         $this->assertEquals("phpunit", $organisation->url);
         $this->assertEquals("active", $organisation->status);
@@ -122,13 +122,13 @@ class OrganisationCreateTest extends TestCase
         $apiKey->saveOrFail();
 
         $organisation = \App\Models\Organisations::query()
-            ->where("name", "=", "PHPUnit")
+            ->where("name", "=", "PHPUnit4")
             ->count();
 
         $this->assertEquals(0, $organisation);
 
 
-        $this->post("/v2/organisations", ["name" => "PHPUnit", "url" => "phpunit"], ["accept" => "application/json", "authorization" => "phpunit"]);
+        $this->post("/v2/organisations", ["name" => "PHPUnit4", "url" => "phpunit"], ["accept" => "application/json", "authorization" => "phpunit"]);
 
         $data = \GuzzleHttp\json_decode($this->response->getContent(), true);
 
@@ -142,6 +142,8 @@ class OrganisationCreateTest extends TestCase
     }
 
     public function testEventIsFired() {
+        $this->artisan("migrate:fresh");
+        $this->artisan("db:seed");
         $this->expectsEvents(App\Events\OrganisationCreate::class);
 
         $user = \App\Models\User::query()->where("name", "=", "admin")->first();
@@ -150,14 +152,14 @@ class OrganisationCreateTest extends TestCase
         $apiKey = new App\Models\ApiKey();
         $apiKey->user_id = $user->id;
         $apiKey->typ = "login";
-        $apiKey->api_token = "phpunit";
+        $apiKey->api_token = "phpunit2createtest";
         $apiKey->saveOrFail();
 
-        $this->post("/v2/organisations", ["name" => "PHPUnit", "url" => "phpunit"], ["accept" => "application/json", "authorization" => "phpunit"]);
+        $this->post("/v2/organisations", ["name" => "PHPUnit5"], ["accept" => "application/json", "authorization" => "phpunit2createtest"]);
     }
 
     public function testCreateORganisationWithoutValidAPIKey() {
-        $this->post("/v2/organisations", ["name" => "PHPUnit"], ["accept" => "application/json", "authorization" => "phpunit"]);
+        $this->post("/v2/organisations", ["name" => "PHPUnit6"], ["accept" => "application/json", "authorization" => "phpunitInvalide"]);
 
         $data = \GuzzleHttp\json_decode($this->response->getContent(), true);
 

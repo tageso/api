@@ -3,12 +3,19 @@
 abstract class TestCase extends Laravel\Lumen\Testing\TestCase
 {
 
+    static private $hasSetup = false;
     public function setUp()
     {
         parent::setUp();
-        $this->artisan("migrate:fresh");
-        $this->artisan("db:seed");
+        if(!self::$hasSetup)
+        {
+            $this->artisan("migrate:fresh");
+            $this->artisan("db:seed");
+            self::$hasSetup = true;
+        }
+
     }
+
     /**
      * Creates the application.
      *

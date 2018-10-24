@@ -47,7 +47,7 @@ class AgendaGetDeprecatedTest extends TestCase
         $this->assertFalse($data["data"]["access"]["edit"]);
         $this->assertTrue($data["data"]["access"]["new"]);
         $this->assertFalse($data["data"]["access"]["protocol"]);
-        $this->assertFalse($data["data"]["access"]["read"]);
+        $this->assertTrue($data["data"]["access"]["read"]);
         $this->assertFalse($data["data"]["access"]["access"]);
         $this->assertFalse($data["data"]["access"]["notificationMailProtocol"]);
         $this->assertFalse($data["data"]["access"]["comment"]);

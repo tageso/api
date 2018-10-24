@@ -30,38 +30,35 @@ class AccountRegisterTest extends TestCase
         $this->assertEquals("hello@kekskurse.de", $data["data"]["email"]);
         $this->assertEquals("validateSend", $data["data"]["status"]);
         $this->assertEquals("validateSend", $data["data"]["mailStatus"]);
-        $this->assertEquals(203, $data["data"]["id"]);
     }
 
     public function testRegisterUsernameToLower() {
         $this->withoutEvents();
 
-        $this->post('/v2/account/register', ["name"=>"tEstUsEr", "password"=>"adminadmin", "email" => "hello@kekskurse.de"], ["accept" => "application/json"]);
+        $this->post('/v2/account/register', ["name"=>"tEstUsEr2", "password"=>"adminadmin", "email" => "hello2@kekskurse.de"], ["accept" => "application/json"]);
 
         $data = \GuzzleHttp\json_decode($this->response->getContent(), true);
 
-        $this->assertEquals("testuser", $data["data"]["name"]);
-        $this->assertEquals("hello@kekskurse.de", $data["data"]["email"]);
+        $this->assertEquals("testuser2", $data["data"]["name"]);
+        $this->assertEquals("hello2@kekskurse.de", $data["data"]["email"]);
         $this->assertEquals("validateSend", $data["data"]["status"]);
         $this->assertEquals("validateSend", $data["data"]["mailStatus"]);
-        $this->assertEquals(203, $data["data"]["id"]);
 
     }
 
     public function testTwoRegistrationWithSameUsernameButLowerUpper() {
         $this->withoutEvents();
 
-        $this->post('/v2/account/register', ["name"=>"tEstUsEr", "password"=>"adminadmin", "email" => "hello@kekskurse.de"], ["accept" => "application/json"]);
+        $this->post('/v2/account/register', ["name"=>"tEstUsEr3", "password"=>"adminadmin", "email" => "hello3@kekskurse.de"], ["accept" => "application/json"]);
 
         $data = \GuzzleHttp\json_decode($this->response->getContent(), true);
 
-        $this->assertEquals("testuser", $data["data"]["name"]);
-        $this->assertEquals("hello@kekskurse.de", $data["data"]["email"]);
+        $this->assertEquals("testuser3", $data["data"]["name"]);
+        $this->assertEquals("hello3@kekskurse.de", $data["data"]["email"]);
         $this->assertEquals("validateSend", $data["data"]["status"]);
         $this->assertEquals("validateSend", $data["data"]["mailStatus"]);
-        $this->assertEquals(203, $data["data"]["id"]);
 
-        $this->post('/v2/account/register', ["name"=>"TeSTuSeR", "password"=>"adminadmin", "email" => "test@tageso.de"], ["accept" => "application/json"]);
+        $this->post('/v2/account/register', ["name"=>"TeSTuSeR3", "password"=>"adminadmin", "email" => "test3@tageso.de"], ["accept" => "application/json"]);
 
         $data = \GuzzleHttp\json_decode($this->response->getContent(), true);
 
@@ -86,7 +83,6 @@ class AccountRegisterTest extends TestCase
         $this->assertEquals("test@tageso.de", $data["data"]["email"]);
         $this->assertEquals("validateSend", $data["data"]["status"]);
         $this->assertEquals("validateSend", $data["data"]["mailStatus"]);
-        $this->assertEquals(203, $data["data"]["id"]);
 
         $this->post('/v2/account/register', ["name"=>"user2", "password"=>"adminadmin", "email" => "test@tageso.de"], ["accept" => "application/json"]);
 
@@ -105,7 +101,7 @@ class AccountRegisterTest extends TestCase
     public function testInvalideEmail() {
         $this->withoutEvents();
 
-        $this->post('/v2/account/register', ["name"=>"TeSTuSeR", "password"=>"adminadmin", "email" => "test@google"], ["accept" => "application/json"]);
+        $this->post('/v2/account/register', ["name"=>"TeSTuSeRInvalide", "password"=>"adminadmin", "email" => "test@google"], ["accept" => "application/json"]);
 
         $data = \GuzzleHttp\json_decode($this->response->getContent(), true);
 
@@ -120,7 +116,7 @@ class AccountRegisterTest extends TestCase
 
     public function testShortUsername() {
         $this->withoutEvents();
-        $this->post('/v2/account/register', ["name"=>"abc", "password"=>"adminadmin", "email" => "test@tageso.de"], ["accept" => "application/json"]);
+        $this->post('/v2/account/register', ["name"=>"abc", "password"=>"adminadmin", "email" => "testinvalide@tageso.de"], ["accept" => "application/json"]);
 
         $data = \GuzzleHttp\json_decode($this->response->getContent(), true);
 
@@ -136,7 +132,7 @@ class AccountRegisterTest extends TestCase
 
     public function testInvalideName() {
         $this->withoutEvents();
-        $this->post('/v2/account/register', ["name"=>"abökc", "password"=>"adminadmin", "email" => "test@tageso.de"], ["accept" => "application/json"]);
+        $this->post('/v2/account/register', ["name"=>"abökc", "password"=>"adminadmin", "email" => "testinvalide@tageso.de"], ["accept" => "application/json"]);
 
         $data = \GuzzleHttp\json_decode($this->response->getContent(), true);
 
@@ -151,7 +147,7 @@ class AccountRegisterTest extends TestCase
     }
     public function testTooShortPassword() {
         $this->withoutEvents();
-        $this->post('/v2/account/register', ["name"=>"abcuserabc", "password"=>"abc", "email" => "test@tageso.de"], ["accept" => "application/json"]);
+        $this->post('/v2/account/register', ["name"=>"abcuserabc", "password"=>"abc", "email" => "testinvalide@tageso.de"], ["accept" => "application/json"]);
 
         $data = \GuzzleHttp\json_decode($this->response->getContent(), true);
 
@@ -168,7 +164,7 @@ class AccountRegisterTest extends TestCase
     public function testEventIsFired() {
         $this->expectsEvents(App\Events\UserRegisterEvent::class);
 
-        $this->post('/v2/account/register', ["name"=>"testuser", "password"=>"adminadmin", "email" => "hello@kekskurse.de"], ["accept" => "application/json"]);
+        $this->post('/v2/account/register', ["name"=>"testuser4", "password"=>"adminadmin", "email" => "hello4@kekskurse.de"], ["accept" => "application/json"]);
 
         $data = \GuzzleHttp\json_decode($this->response->getContent(), true);
 
