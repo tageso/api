@@ -24,6 +24,7 @@ $router->group(['prefix' => 'v2'], function () use ($router) {
     $router->group(['prefix' => 'profile'], function () use ($router) {
         $router->get("/me", ["uses" => 'AccountController@getAccountMe']);
         $router->get("/{user_id}", ["uses" => 'ProfileController@getProfile']);
+        $router->patch("/{user_id}", ["uses" => 'ProfileController@updateProfile']);
     });
     $router->group(['prefix' => 'organisations'], function () use ($router) {
         $router->get("/", ["uses" => 'OrganisationController@listOrganisationForUser']);
