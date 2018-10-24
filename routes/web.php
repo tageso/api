@@ -67,5 +67,5 @@ $router->get('/info', function (\App\Lib\Metainfo $metainfo) use ($router) {
     return \GuzzleHttp\json_encode($data);
 });
 $router->get('', function () {
-    return view('index', ['name' => 'James']);;
+    return redirect('/index.html');
 });
