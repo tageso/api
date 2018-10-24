@@ -1,0 +1,17 @@
+AccountLogin
+ [x] Sample
+
+AccountRegister
+ [x] Register username exists
+ [x] Register account
+ [x] Register username to lower
+ [x] Two registration with same username but lower upper
+ [x] User email twice
+
+Example
+ [x] Example
+
+Metainfo
+ [x] Commit hash with file exists
+ [x] Commit hash without file
+

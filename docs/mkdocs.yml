@@ -1,0 +1,9 @@
+site_name: Tageso API v2
+nav:
+- Setup: setup.md
+- API: api.md
+- User-Events: user_events.md
+- Core-Events: events.md
+- Core-Plugins: core_plugins.md
+- Versionen: version.md
+theme: material

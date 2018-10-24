@@ -1,0 +1,718 @@
+swagger: "2.0"
+info:
+  description: "Tageso API (work in process)"
+  version: "2.0.0"
+  title: "tageso"
+  contact:
+    email: "info@tageso.de"
+host: "localhost:8000"
+basePath: "/v2/"
+schemes:
+- "https"
+- "http"
+paths:
+  /info:
+    get:
+      tags:
+      - System
+      summary: Return a list of all Agends the User has access to
+      description: Return all Agendas the user has ask to get access
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "The Service is ok"
+          schema:
+            type: object
+            properties:
+              lumen:
+                type: string
+                description: Lumen Version
+                example: Lumen (5.7.1) (Laravel Components 5.7.*)
+              commitHash:
+                type: string
+                description: Commit hash or "dev"
+                example: dev
+  /account/login:
+    post:
+      tags:
+      - Account
+      summary: Login
+      description: Login and get Token
+      produces:
+      - "application/json"
+      consumes:
+      - "application/json"
+      - "multipart/form-data"
+      parameters:
+      - name: name
+        in: formData
+        description: Username
+        type: string
+        required: true
+      - name: password
+        in: formData
+        description: Password
+        type: string
+        required: true
+      responses:
+        200:
+          description: OK
+          schema:
+            type: object
+            properties:
+              data:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    description: API Token, used for Auth
+                    example: HTeNglBIG220QpoWtwEy1akXr
+                  typ:
+                    type: string
+                    description: Type of the token
+                    example: login
+                  user_id:
+                    type: integer
+                    description: User-ID
+                    example: 4
+        400:
+          description: Something go wrong
+        404:
+          description: User not found
+  /account/register:
+    post:
+      tags:
+      - Account
+      summary: Register
+      description: Register a new Account
+      produces:
+      - "application/json"
+      consumes:
+      - "application/json"
+      - "multipart/form-data"
+      parameters:
+      - name: name
+        in: formData
+        description: Username
+        type: string
+        required: true
+      - name: password
+        in: formData
+        description: Password
+        type: string
+        required: true
+      - name: email
+        in: formData
+        description: E-Mail adress
+        type: string
+        required: true
+      responses:
+        200:
+          description: OK
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: '#/definitions/User'
+        400:
+          description: Something go wrong
+        404:
+          description: User not found
+  /organisations:
+    get:
+      tags:
+      - Organisation
+      summary: Return a list of all Organisations the User has access to
+      description: Return all Organisation the user has ask to get access
+      produces:
+      - "application/json"
+      parameters:
+      - name: page
+        in: query
+        description: Page Number
+        type: integer
+        required: false
+        default: 1
+      responses:
+        200:
+          description: OK
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/definitions/Organisation'
+              pagination:
+                $ref: '#/definitions/Pagination'
+        401:
+          description: User not logged in
+    post:
+      tags:
+      - Organisation
+      summary: Create a new Organisation
+      description: Create a new Organisation
+      produces:
+      - "application/json"
+      consumes:
+      - "application/json"
+      - "multipart/form-data"
+      parameters:
+      - name: name
+        in: formData
+        description: Name of the Organisation
+        type: string
+        required: true
+      - name: public
+        in: formData
+        description: If the organisation is public
+        type: boolean
+        required: false
+        default: true
+      - name: url
+        in: formData
+        description: URL-Name for the organisation
+        type: string
+        required: false
+        default: null
+      responses:
+        200:
+          description: OK
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/definitions/Organisation'
+        401:
+          description: User not logged in
+  /organisations/{id}:
+    get:
+      tags:
+      - Organisation
+      summary: Return details for a Organisation
+      description: Return details for a Organisation
+      produces:
+      - "application/json"
+      parameters:
+      - name: id
+        in: path
+        description: Organisation ID
+        type: integer
+        required: true
+        default: 1
+      responses:
+        200:
+          description: OK
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/definitions/Organisation'
+        401:
+          description: User not logged in
+        403:
+          description: No Access to this Agenda
+        404:
+          description: Agenda not found
+    patch:
+      tags:
+      - Organisation
+      summary: Update a Organisation
+      description: Update a Organisation
+      produces:
+      - "application/json"
+      consumes:
+      - "application/json"
+      - "multipart/form-data"
+      parameters:
+      - name: name
+        in: formData
+        description: Name of the Organisation
+        type: string
+        required: false
+        default: null
+      - name: public
+        in: formData
+        description: If the organisation is public
+        type: boolean
+        required: false
+        default: null
+      - name: url
+        in: formData
+        description: URL-Name for the organisation
+        type: string
+        required: false
+        default: null
+      - name: id
+        in: path
+        description: Organisation ID
+        type: integer
+        required: true
+      responses:
+        200:
+          description: OK
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/definitions/Organisation'
+        401:
+          description: User not logged in
+        403:
+          description: You dont have permission to change this Organisation
+    delete:
+      tags:
+      - Organisation
+      summary: Delete a Organisation
+      description: Delete a Organisation
+      produces:
+      - "application/json"
+      parameters:
+      - name: id
+        in: path
+        description: Organisation ID
+        type: integer
+        required: true
+      responses:
+        200:
+          description: OK
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/definitions/Organisation'
+        401:
+          description: User not logged in
+        403:
+          description: No Access to this Agenda
+        404:
+          description: Agenda not found
+  /organisations/{id}/categories:
+    get:
+      tags:
+      - Categories
+      summary: Return a list of Categories for the Organisations
+      description: Return a list of Categories for the Organisations
+      produces:
+      - "application/json"
+      parameters:
+      - name: id
+        in: path
+        description: Organisation ID
+        type: integer
+        required: true
+      - name: page
+        in: query
+        description: Page Number
+        type: integer
+        required: false
+        default: 1
+      responses:
+        200:
+          description: OK
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/definitions/Organisation'
+              pagination:
+                $ref: '#/definitions/Pagination'
+        401:
+          description: User not logged in
+        403:
+          description: No Access to this Organisation
+        404:
+          description: ORganisation not found
+  /organisations/{id}/agenda:
+    get:
+      tags:
+      - Agenda
+      summary: Return a list of Categories and Items in the right order
+      description: Return a list of Categories and Items in the right order
+      produces:
+      - "application/json"
+      parameters:
+      - name: id
+        in: path
+        description: Organisation ID
+        type: integer
+        required: true
+      responses:
+        200:
+          description: OK
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: '#/definitions/Agenda'
+        401:
+          description: User not logged in
+        403:
+          description: No Access to this Organisation
+        404:
+          description: Organisation not found
+    patch:
+      tags:
+      - Agenda
+      summary: Change the Position of all Categories and Items
+      description: Change the Position of all Categories and Items based on the position in the given JSON. **Ignoring the position and categorie value inside the JSON.**
+      produces:
+      - "application/json"
+      parameters:
+      - name: id
+        in: path
+        description: Organisation ID
+        type: integer
+        required: true
+      - in: body
+        name: Agenda
+        schema:
+          $ref: '#/definitions/Agenda'
+      responses:
+        200:
+          description: OK
+        401:
+          description: User not logged in
+        403:
+          description: No Access to this Organisation
+        404:
+          description: Organisation not found
+  /organisations/{id}/agenda/deprecated:
+    get:
+      tags:
+      - Agenda
+      summary: Old API Call to get all Information about a Agenda and Users Access for this Agenda
+      description: Old API Call to get all Information about a Agenda and Users Access for this Agenda
+      produces:
+      - "application/json"
+      parameters:
+      - name: id
+        in: path
+        description: Organisation ID
+        type: integer
+        required: true
+      responses:
+        200:
+          description: Request OK
+          schema:
+            type: object
+            properties:
+              allItems:
+                $ref: '#/definitions/Agenda'
+              agenda:
+                $ref: '#/definitions/Organisation'
+              access:
+                $ref: '#/definitions/Access'
+        401:
+          description: User not logged in
+        403:
+          description: No Access to this Organisation
+        404:
+          description: Organisation not found
+
+  /organisations/{id}/item:
+    get:
+      tags:
+      - Item
+      summary: Return a list of Item for the given Organisation
+      description: Old API Call to get all Information about a Agenda and Users Access for this Agenda
+      produces:
+      - "application/json"
+      parameters:
+      - name: id
+        in: path
+        description: Organisation ID
+        type: integer
+        required: true
+      responses:
+        200:
+          description: Request OK
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/definitions/Item'
+              pagination:
+                $ref: '#/definitions/Pagination'
+        401:
+          description: User not logged in
+        403:
+          description: No Access to this Organisation
+        404:
+          description: Organisation not found
+
+definitions:
+  Pagination:
+    type: object
+    properties:
+      currentPage:
+        type: integer
+        description: Current Page
+      pageCount:
+        type: integer
+        description: Number of Pages for this Request
+      itemsPerPage:
+        type: integer
+        description: How many Items are at one Page
+    example:
+      currentPage: 1
+      pageCount: 12
+      itemsPerPage: 20
+    required:
+    - currentPage
+    - pageCount
+    - itemsPerPage
+
+  Item:
+    type: object
+    properties:
+      id:
+        type: integer
+        description: ID of the Item
+      name:
+        type: string
+        description: Name of the Item
+      description:
+        type: string
+        description: Description of the Item
+      category:
+        type: integer
+        description: ID of the Category of the Item
+      position:
+        type: integer
+        description: Position in the Category
+      account:
+        type: integer
+        description: User who creare the Item
+      date:
+        type: integer
+        description: Unix Timestamp of the create
+      status:
+        type: string
+        enum:
+        - active
+        - closed
+        - deleted
+      _id:
+        type: integer
+        description: DEPRICATET! ID of the Item
+      agenda:
+        type: integer
+        description: DEPRICATET! ID of the Organisation
+      done:
+        type: boolean
+        description: DEPRICATET! If the Status is closed
+  Agenda:
+    type: array
+    items:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: ID of the Categorie(!)
+        name:
+          type: string
+          description: Name of the Categorie
+        organisation:
+          type: integer
+          description: DEPRICATET! ID of the Organisation
+        status:
+          type: string
+          enum:
+          - active
+          - deleted
+          description: Status of the Categorie
+        position:
+          type: integer
+          description: Position of the Categorie in the Agenda
+        openItemsCount:
+          type: integer
+          description: DEPRICATET! Nummber of open Items in this Categorie
+        agenda:
+          type: integer
+          description: DEPRICATET! ID of the Organisation
+        delete:
+          type: boolean
+          description: DEPRICATET! If the Categorie is deleted
+        _id:
+          type: integer
+          description: DEPRICATET! ID of the Categorie
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+                description: ID of the Item
+              name:
+                type: string
+                description: Name of the Item
+              description:
+                type: string
+                description: Description Text of the Item
+              category:
+                type: integer
+                description: DEPRICATET! ID of the Categorie
+              position:
+                type: integer
+                description: Position of the Item in the Categorie
+              account:
+                type: integer
+                description: DEPRICATET! User ID of the User who create the Item
+              date:
+                type: integer
+                description: DEPRICATET! Unix Timestamp of the create time
+              status:
+                type: string
+                enum:
+                - active
+                - deleted
+                - done
+                description: Status of the Item
+              _id:
+                type: integer
+                description: DEPRICATET! ID of the Item
+              agenda:
+                type: integer
+                description: DEPRICATET! ID of the Organisation
+              done:
+                type: boolean
+                description: DEPRICATET! If the Item is marked as done/status is done
+
+
+
+
+  Organisation:
+    type: object
+    properties:
+      id:
+        type: integer
+        description: ID of the Organisation
+      name:
+        type: string
+        description: Name of the Organisation
+      status:
+        type: string
+        description: Status of this Organisation
+        enum:
+        - active
+        - deleted
+      url:
+        type: string
+        description: Custom URL-Part for this Organisation
+      public:
+        type: boolean
+        description: If the Organisation is public
+      openProtocol:
+        type: boolean
+        description: Show if the Organisation has a open protocol
+      delete:
+        type: boolean
+        description: DEPRICATET! If the Organisation is deleted. Use status instead
+      _id:
+        type: integer
+        description: DEPRICATET! ID of the Organisation. Use id instead
+    required:
+    - id
+    - name
+    - status
+    example:
+      id: 4
+      name: Sample Agenda
+      status: aktive
+      delete: false
+      _id: 4
+
+  Access:
+    type: object
+    properties:
+      account:
+        type: integer
+        description: ID of the User
+      organisation:
+        type: integer
+        description: ID of the Organisation
+      admin:
+        type: boolean
+        description: User has Admin Access
+      edit:
+        type: boolean
+        description: User can edit the Organisation Agenda
+      new:
+        type: boolean
+        description: User Access has not been seen by a Administrator
+      protocol:
+        type: boolean
+        description: User can write a Protocol for this Orgnaisation
+      read:
+        type: boolean
+        description: User can read current Agenda and old Protocols
+      access:
+        type: boolean
+        description: User has access to this Organisation
+      notificationMailProtocol:
+        type: boolean
+        description: User get new Protocol as Mail
+      comment:
+        type: boolean
+        description: User can write Comments to the Organisation Items
+      _id:
+        type: integer
+        description: DEPRICATET!
+        default: null
+      agenda:
+        type: integer
+        description: DEPRICATET! Use organisation
+      callName:
+        type: string
+        description: DEPRICATET! Use name
+
+  User:
+    type: object
+    properties:
+      id:
+        type: integer
+        description: Contract phase id
+      name:
+        type: string
+        description: The Login-Name of the User
+      email:
+        type: string
+        format: email
+        description: E-Mail of the User
+      status:
+        type: string
+        description: Status of the User
+      mailStatus:
+        type: string
+        description: Status of the Mail (if the user change the mail adress)
+      updated_at:
+        type: string
+        format: datetime
+        description: Last Update at the UserObject
+      created_at:
+        type: string
+        format: datetime
+        description: Time of the user create
+    example:
+      id: 4
+      name: testuser
+      email: test@tageso.de
+      status: active
+      mailStatus: validateSend
+      updated_at: "2018-09-25 15:36:25"
+      created_at: "2018-09-25 15:36:25"
