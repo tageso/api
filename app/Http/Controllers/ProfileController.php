@@ -32,7 +32,7 @@ class ProfileController extends BaseController
         }
 
         if (!(Auth::user()->admin || Auth::user()->id == $user_id)) {
-           throw new HTTPException("You have no permission to change this User", 403);
+            throw new HTTPException("You have no permission to change this User", 403);
         }
 
         $userProfile = UserProfile::query()->where("user_id", "=", $user_id)->first();
