@@ -13,22 +13,23 @@ use Illuminate\Support\Facades\Auth;
 use Laravel\Lumen\Routing\Controller as BaseController;
 use TaGeSo\APIResponse\Response;
 
-
-class AccessController extends BaseController {
-    public function getAccessDetails($organisation_id, $user_id, Response $response) {
-        if(!Auth::check()) {
+class AccessController extends BaseController
+{
+    public function getAccessDetails($organisation_id, $user_id, Response $response)
+    {
+        if (!Auth::check()) {
             throw new NotLoggedInException();
         }
 
-        if($user_id != Auth::user()->id) {
+        if ($user_id != Auth::user()->id) {
             $access = UserOrganisations::getAccess(Auth::user()->id, $organisation_id);
-            if(!$access->admin) {
+            if (!$access->admin) {
                 throw new HTTPException("You don't have Permission to see this Access", 403);
             }
         }
 
         $user = User::query()->where("id", "=", $user_id)->first();
-        if($user === null) {
+        if ($user === null) {
             throw new HTTPException("User not found", 404);
         }
 
@@ -36,22 +37,24 @@ class AccessController extends BaseController {
         return $response->withData(new Access($access));
     }
 
-    public function getAccessDetailsMe($organisation_id, Response $response) {
-        if(!Auth::check()) {
+    public function getAccessDetailsMe($organisation_id, Response $response)
+    {
+        if (!Auth::check()) {
             throw new NotLoggedInException();
         }
 
         return $this->getAccessDetails($organisation_id, Auth::user()->id, $response);
     }
 
-    public function listAccess($organisation_id, Response $response) {
-        if(!Auth::check()) {
+    public function listAccess($organisation_id, Response $response)
+    {
+        if (!Auth::check()) {
             throw new NotLoggedInException();
         }
 
         $access = UserOrganisations::getAccess(Auth::user()->id, $organisation_id);
 
-        if(!$access->admin) {
+        if (!$access->admin) {
             throw new HTTPException("You don't have Permission to see this Access", 403);
         }
 
@@ -60,7 +63,7 @@ class AccessController extends BaseController {
             ->where("access", "=", true)
             ->paginate(100);
 
-        foreach($access as $accessItem) {
+        foreach ($access as $accessItem) {
             $accessItem->username = UserProfile::query()
                 ->where("user_id", "=", $accessItem->user_id)
                 ->first()
@@ -69,18 +72,20 @@ class AccessController extends BaseController {
         $response->setPagination(
             $access->currentPage(),
             $access->lastPage(),
-            $access->perPage());
+            $access->perPage()
+        );
 
         return $response->withData(Access::collection($access));
     }
 
-    public function editAccess($organisation_id, $user_id, Request $request, Response $response) {
-        if(!Auth::check()) {
+    public function editAccess($organisation_id, $user_id, Request $request, Response $response)
+    {
+        if (!Auth::check()) {
             throw new NotLoggedInException();
         }
 
         $userAccess = UserOrganisations::getAccess(Auth::user()->id, $organisation_id);
-        if(!$userAccess->admin) {
+        if (!$userAccess->admin) {
             throw new HTTPException("You don't have permission to change the Access for this Organisation", 403);
         }
 
@@ -99,14 +104,15 @@ class AccessController extends BaseController {
         return $response->withData(new Access($access));
     }
 
-    public function notificationDeprecated($organisation_id, Request $request, Response $response) {
-        if(!Auth::check()) {
+    public function notificationDeprecated($organisation_id, Request $request, Response $response)
+    {
+        if (!Auth::check()) {
             throw new NotLoggedInException();
         }
 
         $userAccess = UserOrganisations::getAccess(Auth::user()->id, $organisation_id);
 
-        if(!$userAccess->access || !$userAccess->read) {
+        if (!$userAccess->access || !$userAccess->read) {
             throw new HTTPException("You don't have permission to change the Notification settings");
         }
 

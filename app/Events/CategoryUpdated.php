@@ -25,19 +25,23 @@ class CategoryUpdated extends Event
         $this->changes = $changes;
     }
 
-    public function getCategory(): Categories {
+    public function getCategory(): Categories
+    {
         return $this->category;
     }
 
-    public function getChanges(): array {
+    public function getChanges(): array
+    {
         return $this->changes;
     }
 
-    public function getObjectId(): int {
+    public function getObjectId(): int
+    {
         return $this->category->id;
     }
 
-    public function getPayload() {
+    public function getPayload()
+    {
         return [
             "changes" => $this->changes
         ];

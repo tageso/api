@@ -19,14 +19,15 @@ use TaGeSo\APIResponse\Response;
 
 class CategoryController extends BaseController
 {
-    public function listCategories($id, Response $response) {
+    public function listCategories($id, Response $response)
+    {
         $organisation = Organisations::getById($id);
-        if($organisation == NULL) {
+        if ($organisation == null) {
             throw new HTTPException("Organisation not found", 404);
         }
 
-        if($organisation->public == false) {
-            if(!Auth::check()) {
+        if ($organisation->public == false) {
+            if (!Auth::check()) {
                 throw new NotLoggedInException();
             }
 
@@ -35,14 +36,14 @@ class CategoryController extends BaseController
                 ->where("organisation_id", "=", $id)
                 ->first();
 
-            if($organisationAuth == NULL || $organisationAuth->access == false || $organisationAuth->read == false) {
+            if ($organisationAuth == null || $organisationAuth->access == false || $organisationAuth->read == false) {
                 throw new HTTPException("You don't have permission to see this Page", 403);
             }
         }
 
         $categories = Categories::getForOrganisation($organisation->id);
 
-        foreach($categories as $category) {
+        foreach ($categories as $category) {
             $category->openItemsCount = count(
                 Item::query()
                     ->where("category_id", "=", $category->id)
@@ -57,21 +58,22 @@ class CategoryController extends BaseController
         return $response->withData(Category::collection($categories));
     }
 
-    public function updateCategoriesDeprecated($id, Request $request, Response $response) {
+    public function updateCategoriesDeprecated($id, Request $request, Response $response)
+    {
         Log::debug("Update Category");
-        if(!Auth::check()) {
+        if (!Auth::check()) {
             throw new NotLoggedInException();
         }
 
         $access = UserOrganisations::getAccess(Auth::user()->id, $id);
-        if(!$access->admin) {
+        if (!$access->admin) {
             throw new HTTPException("Only admins can change the Categories", 403);
         }
 
         $json = \GuzzleHttp\json_decode($request->getContent(), true);
 
         $position = 0;
-        foreach($json["categories"] as $categoryData) {
+        foreach ($json["categories"] as $categoryData) {
             $category = Categories::query()->where("id", "=", $categoryData["id"])->first();
             $category->position = $position;
             $category->saveOrFail();
@@ -79,13 +81,14 @@ class CategoryController extends BaseController
         }
     }
 
-    public function createCategory($id, Request $request, Response $response) {
-        if(!Auth::check()) {
+    public function createCategory($id, Request $request, Response $response)
+    {
+        if (!Auth::check()) {
             throw new NotLoggedInException();
         }
 
         $access = UserOrganisations::getAccess(Auth::user()->id, $id);
-        if(!$access->admin) {
+        if (!$access->admin) {
             throw new HTTPException("Only admins can create a Categories", 403);
         }
 
@@ -101,18 +104,19 @@ class CategoryController extends BaseController
         return $response->withData(new Category($category));
     }
 
-    public function deleteCategory($id, $category_id,  Response $response) {
-        if(!Auth::check()) {
+    public function deleteCategory($id, $category_id, Response $response)
+    {
+        if (!Auth::check()) {
             throw new NotLoggedInException();
         }
 
         $access = UserOrganisations::getAccess(Auth::user()->id, $id);
-        if(!$access->admin) {
+        if (!$access->admin) {
             throw new HTTPException("Only admins can create a Categories", 403);
         }
 
         $category = Categories::query()->where("id", "=", $category_id)->first();
-        if($category->organisation_id != $id) {
+        if ($category->organisation_id != $id) {
             throw new HTTPException("Category is not in the Organisation", 400);
         }
 

@@ -40,8 +40,9 @@ class Item extends Model
 
     ];
 
-    public function calculateNexFreePosition() {
-        if(empty($this->category_id)) {
+    public function calculateNexFreePosition()
+    {
+        if (empty($this->category_id)) {
             throw new HTTPException("No Organisation set, but needed to calculate Position");
         }
 
@@ -50,7 +51,7 @@ class Item extends Model
             ->orderBy("position", "DESC")
             ->first();
 
-        if($res == null) {
+        if ($res == null) {
             $this->position = 0;
         } else {
             $this->position = $res->position + 1;

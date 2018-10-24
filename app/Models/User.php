@@ -44,7 +44,8 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     ];
 
 
-    public function generateMailToken($length = 25) {
+    public function generateMailToken($length = 25)
+    {
         $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
         $charactersLength = strlen($characters);
         $randomString = '';
@@ -54,7 +55,8 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         $this->mailToken = $randomString;
     }
 
-    public function generateDisabledMailToken($length = 25) {
+    public function generateDisabledMailToken($length = 25)
+    {
         $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
         $charactersLength = strlen($characters);
         $randomString = '';
@@ -64,12 +66,13 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         $this->disabledMailsToken = $randomString;
     }
 
-    public function getProfile() {
-        if($this->profile !== null) {
+    public function getProfile()
+    {
+        if ($this->profile !== null) {
             return $this->profile;
         }
         $this->profile = UserProfile::query()->where("user_id", "=", $this->id)->first();
-        if($this->profile == null) {
+        if ($this->profile == null) {
             throw new \Exception("UserProfile not found");
         }
         return $this->profile;

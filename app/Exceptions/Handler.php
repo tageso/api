@@ -55,23 +55,20 @@ class Handler extends ExceptionHandler
             "code" => $exception->getCode()
         ];
 
-        if(is_a($exception, \App\Exceptions\HTTPException::class)){
+        if (is_a($exception, \App\Exceptions\HTTPException::class)) {
             $response->setStatusCode($exception->getHttpCode());
             $data["httpCode"] = $exception->getHttpCode();
             $data["typ"] = "http";
-        }
-        elseif(is_a($exception, NotFoundHttpException::class)){
+        } elseif (is_a($exception, NotFoundHttpException::class)) {
             $data["typ"] = "exception";
             $data["msg"] = "API Endpoint not found";
             $data["httpCode"] = 500;
-        }
-        elseif(is_a($exception, "Illuminate\Validation\ValidationException")) {
+        } elseif (is_a($exception, "Illuminate\Validation\ValidationException")) {
             $response->setStatusCode(400);
             $data["validation"] = $exception->errors();
             $data["httpCode"] = 400;
             $data["typ"] = "validation";
-        }
-        else {
+        } else {
             $data["typ"] = "exception";
             $data["exception"] = get_class($exception);
             $data["line"] = $exception->getLine();
@@ -87,7 +84,7 @@ class Handler extends ExceptionHandler
         }*/
 
 
-        if($request->header("accept") == "application/json") {
+        if ($request->header("accept") == "application/json") {
             $response->setContent(\GuzzleHttp\json_encode($data));
         }
 

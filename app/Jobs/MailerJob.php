@@ -54,7 +54,7 @@ class MailerJob extends Job
         $mailer->Subject = $this->subject;
 
 
-        if(!empty($this->bodyHTML)) {
+        if (!empty($this->bodyHTML)) {
             $mailer->isHTML(true);
             $mailer->Body = $this->bodyHTML;
             $mailer->AltBody = $this->bodyPlain;
@@ -62,15 +62,14 @@ class MailerJob extends Job
             $mailer->Body = $this->bodyPlain;
         }
 
-        if(getenv("SEND_MAILS"))
-        {
+        if (getenv("SEND_MAILS")) {
             $r = $mailer->send();
         } else {
             throw new \Exception("Mails disabled");
         }
 
 
-        if($r !== true) {
+        if ($r !== true) {
             throw new \Exception("Mail not send");
         }
     }

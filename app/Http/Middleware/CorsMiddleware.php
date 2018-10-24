@@ -24,13 +24,11 @@ class CorsMiddleware
             'Access-Control-Allow-Headers'     => 'Content-Type, Authorization, X-Requested-With'
         ];
 
-        if ($request->isMethod('OPTIONS'))
-        {
+        if ($request->isMethod('OPTIONS')) {
             Log::debug("OPTIONS Request");
             $response = response()->json('{"method":"OPTIONS"}', 200, $headers);
             Log::debug("Add CORS Header");
-            foreach($headers as $key => $value)
-            {
+            foreach ($headers as $key => $value) {
                 $response->header($key, $value);
             }
             Log::debug("Return CORS Page");
@@ -40,8 +38,7 @@ class CorsMiddleware
         Log::debug("Call Next in Middelware");
         $response = $next($request);
         Log::debug("Add CORS Header");
-        foreach($headers as $key => $value)
-        {
+        foreach ($headers as $key => $value) {
             $response->header($key, $value);
         }
 

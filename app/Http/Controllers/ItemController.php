@@ -19,32 +19,33 @@ use Illuminate\Support\Facades\Auth;
 use Laravel\Lumen\Routing\Controller as BaseController;
 use TaGeSo\APIResponse\Response;
 
+class ItemController extends BaseController
+{
 
-class ItemController extends BaseController {
-
-    public function listItems($organisation_id, Response $response) {
+    public function listItems($organisation_id, Response $response)
+    {
         $organisation = Organisations::getById($organisation_id);
 
-        if($organisation == null) {
+        if ($organisation == null) {
             throw new HTTPException("ORganisation not found", 404);
         }
 
         //Throw Exception if organisation is private and user is not logged in
-        if(!$organisation->public && !Auth::check()) {
+        if (!$organisation->public && !Auth::check()) {
             throw new NotLoggedInException();
         }
 
 
         //Create Access Object
         $access = null;
-        if(Auth::check()) {
+        if (Auth::check()) {
             $access = UserOrganisations::getAccess(Auth::user()->id, $organisation_id);
-            if(!$access->read) {
+            if (!$access->read) {
                 throw new HTTPException("You don't have access to this Organisation", 403);
             }
         } else {
             $access = UserOrganisations::guestAccess($organisation, 0);
-            if(!$access->read) {
+            if (!$access->read) {
                 throw new NotLoggedInException();
             }
         }
@@ -56,7 +57,7 @@ class ItemController extends BaseController {
             ->get(["id"]);
 
         $categorieIds = [];
-        foreach($categories as $category) {
+        foreach ($categories as $category) {
             $categorieIds[] = $category->id;
         }
 
@@ -71,19 +72,21 @@ class ItemController extends BaseController {
         $response->setPagination(
             $items->currentPage(),
             $items->lastPage(),
-            $items->perPage());
+            $items->perPage()
+        );
 
         return $response->withData(\App\Http\Resources\Item::collection(($items)));
     }
 
-    public function createItem($organisation_id, Request $request, Response $response) {
-        if(!Auth::check()) {
+    public function createItem($organisation_id, Request $request, Response $response)
+    {
+        if (!Auth::check()) {
             throw new NotLoggedInException();
         }
 
         $access = UserOrganisations::getAccess(Auth::user()->id, $organisation_id);
 
-        if(!$access->edit) {
+        if (!$access->edit) {
             throw new HTTPException("You don't have Permission to change this Item", 403);
         }
 
@@ -99,16 +102,17 @@ class ItemController extends BaseController {
         return $response->withData(new \App\Http\Resources\Item($item));
     }
 
-    public function detailItemDeprecated($organisation_id, $item_id, Response $response) {
+    public function detailItemDeprecated($organisation_id, $item_id, Response $response)
+    {
         $organisation = Organisations::getById($organisation_id);
 
-        if(!$organisation->public) {
-            if(!Auth::check()) {
+        if (!$organisation->public) {
+            if (!Auth::check()) {
                 throw new NotLoggedInException();
             }
             $access = UserOrganisations::getAccess(Auth::user()->id, $organisation_id);
-            if(!$access->read) {
-               throw new HTTPException("You don't have permission to see this item", 403);
+            if (!$access->read) {
+                throw new HTTPException("You don't have permission to see this item", 403);
             }
         }
 
@@ -117,7 +121,7 @@ class ItemController extends BaseController {
         $agenda = Organisations::getById($category->organisation_id);
         $author = \App\Models\UserProfile::query()->where("user_id", "=", $item->user_id)->first();
         $access = UserOrganisations::guestAccess($organisation, null);
-        if(Auth::check()) {
+        if (Auth::check()) {
             $access = UserOrganisations::getAccess(Auth::user()->id, $organisation_id);
         }
 

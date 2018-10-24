@@ -10,6 +10,7 @@
         "guzzlehttp/guzzle": "~6.0",
         "laravel/lumen-framework": "5.7.*",
         "phpmailer/phpmailer": "^6.0",
+        "squizlabs/php_codesniffer": "*",
         "tageso/api-response": "*",
         "twig/twig": "^2.0",
         "vlucas/phpdotenv": "~2.2"

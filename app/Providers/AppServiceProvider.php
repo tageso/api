@@ -13,7 +13,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->singleton(\Twig_Environment::class, function($app) {
+        $this->app->singleton(\Twig_Environment::class, function ($app) {
             $loader = new \Twig_Loader_Filesystem(__DIR__.'/../../resources/mails');
             $twig = new \Twig_Environment($loader, array(
                 'cache' => __DIR__.'/../../storage/twig/',

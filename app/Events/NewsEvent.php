@@ -23,26 +23,30 @@ class NewsEvent extends Event
         $this->link = $link;
         $this->user = $user;
         $this->timestamp = time();
-
     }
 
-    public function getTitle() {
+    public function getTitle()
+    {
         return $this->title;
     }
 
-    public function getText() {
+    public function getText()
+    {
         return $this->text;
     }
 
-    public function getLink() {
+    public function getLink()
+    {
         return $this->link;
     }
 
-    public function getUser() {
+    public function getUser()
+    {
         return $this->user;
     }
 
-    public function getTimestamp() {
+    public function getTimestamp()
+    {
         return $this->timestamp;
     }
 }

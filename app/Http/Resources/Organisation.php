@@ -26,7 +26,7 @@ class Organisation extends JsonResource
             '_id' => $this->id //Depricated
         ];
 
-        if(isset($this->openProtocol)) {
+        if (isset($this->openProtocol)) {
             $res["openProtocol"] = $this->openProtocol;
         }
 

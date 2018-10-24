@@ -38,5 +38,4 @@ class News extends Model
     protected $hidden = [
 
     ];
-
 }

@@ -30,10 +30,9 @@ class Category extends JsonResource
         ];
 
 
-        if(isset($this->items)) {
+        if (isset($this->items)) {
             $res["items"] = Item::collection(collect($this->items));
         }
-
 
         return $res;
     }

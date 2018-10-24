@@ -6,4 +6,5 @@ Homestead.json
 Homestead.yaml
 .env
 db.sqlite
+db.sqlite-journal
 docs/site/

@@ -20,15 +20,18 @@ class OrganisationUpdated extends Event
         $this->changes = $changes;
     }
 
-    public function getOrganisation(): Organisations {
+    public function getOrganisation(): Organisations
+    {
         return $this->organisations;
     }
 
-    public function getChanges(): array {
+    public function getChanges(): array
+    {
         return $this->changes;
     }
 
-    public function getObjectId(): int {
+    public function getObjectId(): int
+    {
         return $this->organisations->id;
     }
 }

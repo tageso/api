@@ -19,15 +19,18 @@ class OrganisationCreate extends Event
         $this->organisations = $organisations;
     }
 
-    public function getOrganisation(): Organisations {
+    public function getOrganisation(): Organisations
+    {
         return $this->organisations;
     }
 
-    public function getObjectId(): int {
+    public function getObjectId(): int
+    {
         return $this->organisations->id;
     }
 
-    public function getPayload() {
+    public function getPayload()
+    {
         return [
             "organisation" => $this->organisations
         ];

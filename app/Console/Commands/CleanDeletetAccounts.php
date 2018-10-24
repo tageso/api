@@ -43,10 +43,13 @@ class CleanDeletetAccounts extends Command
      */
     public function handle(): void
     {
-        $users = User::query()->where("status", "=", "deleted")->where("password","!=", "")->get();
-        if(count($users) > 0) {
-            foreach($users as $user)
-            {
+        $users = User::query()
+            ->where("status", "=", "deleted")
+            ->where("password", "!=", "")
+            ->get();
+
+        if (count($users) > 0) {
+            foreach ($users as $user) {
                 $user->email = "";
                 $user->password = "";
                 $user->admin = 0;

@@ -36,7 +36,7 @@ class AuthServiceProvider extends ServiceProvider
             $apiKey = ApiKey::query()
                 ->where("api_token", "=", $request->header('authorization'))
                 ->first();
-            if($apiKey === null) {
+            if ($apiKey === null) {
                 return null;
             }
             return $apiKey->getUser();

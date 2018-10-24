@@ -29,7 +29,8 @@ class ApiKey extends Model
         'password',
     ];
 
-    public function generateApiKey($length = 25) {
+    public function generateApiKey($length = 25)
+    {
         $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
         $charactersLength = strlen($characters);
         $randomString = '';
@@ -39,7 +40,8 @@ class ApiKey extends Model
         $this->api_token = $randomString;
     }
 
-    public function getUser() {
+    public function getUser()
+    {
         return User::query()->where("id", "=", $this->user_id)->first();
     }
 }

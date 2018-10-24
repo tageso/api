@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -41,19 +40,21 @@ class UserOrganisations extends Model
         '',
     ];
 
-    static public function getAccess(int $user_id, int $organisation_id) : UserOrganisations {
+    public static function getAccess(int $user_id, int $organisation_id) : UserOrganisations
+    {
         $res = self::query()
             ->where("user_id", "=", $user_id)
             ->where("organisation_id", "=", $organisation_id)
             ->first();
-        if($res == null) {
+        if ($res == null) {
             $organisation = Organisations::getById($organisation_id);
             return self::guestAccess($organisation, $user_id);
         }
         return $res;
     }
 
-    static public function guestAccess(Organisations $organisation, $user_id = null) {
+    public static function guestAccess(Organisations $organisation, $user_id = null)
+    {
         $res = new UserOrganisations();
         $res->access = false;
         $res->user_id = $user_id;
@@ -66,7 +67,8 @@ class UserOrganisations extends Model
         $res->read = false;
         $res->notification_protocol = false;
         $res->comment = false;
-        if($organisation->public == true) {
+
+        if ($organisation->public == true) {
             $res->read = true;
         }
         return $res;

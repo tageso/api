@@ -24,19 +24,23 @@ class ItemUpdated extends Event
         $this->changes = $changes;
     }
 
-    public function getItem(): Item {
+    public function getItem(): Item
+    {
         return $this->item;
     }
 
-    public function getChanges(): array {
+    public function getChanges(): array
+    {
         return $this->changes;
     }
 
-    public function getObjectId(): int {
+    public function getObjectId(): int
+    {
         return $this->item->id;
     }
 
-    public function getPayload() {
+    public function getPayload()
+    {
         return [
             "changes" => $this->changes
         ];

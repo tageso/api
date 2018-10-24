@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+
 /**
  * App\Models\Organisations
  *
@@ -33,7 +34,8 @@ class Organisations extends Model
         '',
     ];
 
-    public static function getById($id) {
+    public static function getById($id)
+    {
         $res = self::query()
             ->where("id", "=", $id)
             ->where("status", "=", "active")

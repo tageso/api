@@ -33,6 +33,4 @@ class CreateLogger
 
         return $logger;
     }
-
-
 }

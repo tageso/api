@@ -28,8 +28,9 @@ class OrganisationController extends Controller
         //
     }
 
-    public function listOrganisationForUser(Request $request, Response $response) {
-        if(!Auth::check()) {
+    public function listOrganisationForUser(Request $request, Response $response)
+    {
+        if (!Auth::check()) {
             throw new NotLoggedInException();
         }
 
@@ -40,28 +41,33 @@ class OrganisationController extends Controller
             ->paginate(20);
 
         $organisations = [];
-        foreach($userOrganisations as $org) {
+        foreach ($userOrganisations as $org) {
             $org = Organisations::getById($org->organisation_id);
-            if($org !== null)
-            {
+            if ($org !== null) {
                 $organisations[] = $org;
             }
         }
 
-        $response->setPagination($userOrganisations->currentPage(), $userOrganisations->lastPage(), $userOrganisations->perPage());
+        $response->setPagination(
+            $userOrganisations->currentPage(),
+            $userOrganisations->lastPage(),
+            $userOrganisations->perPage()
+        );
+
         $response->withData(Organisation::collection(collect($organisations)));
 
         return $response;
     }
 
-    public function getOrganisation($id, Response $response) {
+    public function getOrganisation($id, Response $response)
+    {
         $organisation = Organisations::getById($id);
-        if($organisation == NULL) {
+        if ($organisation == null) {
             throw new HTTPException("Organisation not found", 404);
         }
 
-        if($organisation->public == false) {
-            if(!Auth::check()) {
+        if ($organisation->public == false) {
+            if (!Auth::check()) {
                 throw new NotLoggedInException();
             }
 
@@ -70,7 +76,7 @@ class OrganisationController extends Controller
                 ->where("organisation_id", "=", $id)
                 ->first();
 
-            if($organisationAuth == NULL || $organisationAuth->access == false) {
+            if ($organisationAuth == null || $organisationAuth->access == false) {
                 throw new HTTPException("You don't have permission to see this Page", 403);
             }
         }
@@ -81,8 +87,9 @@ class OrganisationController extends Controller
         return $response->withData(new Organisation($organisation));
     }
 
-    public function createOrganisation(Request $request, Response $response) {
-        if(!Auth::check()) {
+    public function createOrganisation(Request $request, Response $response)
+    {
+        if (!Auth::check()) {
             throw new NotLoggedInException();
         }
 
@@ -92,7 +99,7 @@ class OrganisationController extends Controller
             'url' => 'min:4|max:64|regex:@^[a-z0-9-]*$@',
         ]);
 
-        if($request->input("url", true) && !Auth::user()->admin) {
+        if ($request->input("url", true) && !Auth::user()->admin) {
             throw new HTTPException("URL parameter is just avalible for admins atm", 500);
         }
 
@@ -125,15 +132,16 @@ class OrganisationController extends Controller
         return $response->withData(new Organisation($organisation));
     }
 
-    public function updateOrganisation($id, Request $request, Response $response) {
+    public function updateOrganisation($id, Request $request, Response $response)
+    {
         // Check if user is logged in
-        if(!Auth::check()) {
+        if (!Auth::check()) {
             throw new NotLoggedInException();
         }
 
         // get Organisation
         $organisation = Organisations::getById($id);
-        if($organisation == NULL) {
+        if ($organisation == null) {
             throw new HTTPException("Organisation not found", 404);
         }
 
@@ -144,13 +152,13 @@ class OrganisationController extends Controller
             ->first();
 
         // Check users permissions
-        if($organisationAccess == null) {
+        if ($organisationAccess == null) {
             throw new HTTPException("You don't have access to this Organisation", 403);
         }
-        if(!$organisationAccess->access) {
+        if (!$organisationAccess->access) {
             throw new HTTPException("You don't have permission to change this Organisation", 403);
         }
-        if(!$organisationAccess->admin) {
+        if (!$organisationAccess->admin) {
             throw new HTTPException("You don't have permission to change this Organisation", 403);
         }
 
@@ -162,18 +170,18 @@ class OrganisationController extends Controller
         ]);
 
 
-        if($request->input("url", true) && !Auth::user()->admin) {
+        if ($request->input("url", true) && !Auth::user()->admin) {
             throw new HTTPException("URL parameter is just avalible for admins atm", 500);
         }
 
         $changes = [];
 
-        if($request->input("name", null) !== null) {
+        if ($request->input("name", null) !== null) {
             $changes["name"] = ["old" => $organisation->name, "new" => $request->input("name")];
             $organisation->name = $request->input("name");
         }
 
-        if($request->input("public", null) !== null) {
+        if ($request->input("public", null) !== null) {
             $changes["public"] = ["old" => $organisation->name, "new" => $request->input("public")];
             $organisation->public = $request->input("public");
         }
@@ -185,15 +193,16 @@ class OrganisationController extends Controller
         return $response->withData(new Organisation($organisation));
     }
 
-    public function deleteOrganisation($id, Response $response) {
+    public function deleteOrganisation($id, Response $response)
+    {
         // Check if user is logged in
-        if(!Auth::check()) {
+        if (!Auth::check()) {
             throw new NotLoggedInException();
         }
 
         $access = UserOrganisations::getAccess(Auth::user()->id, $id);
 
-        if(!$access->admin) {
+        if (!$access->admin) {
             throw new HTTPException("Only Admins can delete a organisation", 403);
         }
 
@@ -206,6 +215,5 @@ class OrganisationController extends Controller
         Event::fire(new OrganisationUpdated($organisation, $changeArray));
 
         return $response->withData(new Organisation($organisation));
-
     }
 }

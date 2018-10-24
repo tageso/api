@@ -36,7 +36,8 @@ class User extends JsonResource
             'disabledMailsToken' => null,
             '_id' => $this->id
         ];
-        if($this->status = "deleted") {
+
+        if ($this->status = "deleted") {
             $res["delete"] = true;
         }
         return $res;

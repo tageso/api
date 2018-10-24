@@ -26,13 +26,15 @@ class Item extends JsonResource
             "date" => strtotime($this->created_at),
             "status" => $this->status,
 
-
-
             //Depricated
             '_id' => $this->id,
-             "agenda" => Organisations::getById(
-                Categories::query()->where("id", "=", $this->category_id)->first()->organisation_id
-                )->id,
+            "agenda" => Organisations::getById(
+                Categories::query()
+                    ->where("id", "=", $this->category_id)
+                    ->first()
+                    ->organisation_id
+            )->id
+            ,
             "done" => ($this->status == "closed") ? true : false,
         ];
         return $res;

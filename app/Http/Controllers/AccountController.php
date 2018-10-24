@@ -28,7 +28,8 @@ class AccountController extends Controller
         //
     }
 
-    public function login(Request $request, Response $response) {
+    public function login(Request $request, Response $response)
+    {
         $request->merge(["name" => strtolower($request->input("name"))]);
         $this->validate($request, [
             'name' => 'required|min:4|max:64|regex:@^[a-z0-9-_+]*$@',
@@ -40,31 +41,31 @@ class AccountController extends Controller
 
         $user = User::query()->where("name", "=", $username)->get();
 
-        if(count($user) == 0) {
+        if (count($user) == 0) {
             throw new HTTPException("User not found", 404);
         }
 
-        if(count($user) > 1) {
+        if (count($user) > 1) {
             throw new HTTPException("User not unique", 500);
         }
 
-        if($user[0]->password != hash("sha512", $password)) {
+        if ($user[0]->password != hash("sha512", $password)) {
             throw new HTTPException("Password wrong", 400);
         }
 
-        if($user[0]->twoAuthSecret != null) {
+        if ($user[0]->twoAuthSecret != null) {
             throw new HTTPException("Two Auth is enabled!", 500);
         }
 
-        if($user[0]->status == "validateSend") {
+        if ($user[0]->status == "validateSend") {
             throw new HTTPException("Please check your E-Mail and activate the Account", 400);
         }
 
-        if($user[0]->status == "disabled") {
+        if ($user[0]->status == "disabled") {
             throw new HTTPException("The Account is disabled, please contact the support!", 400);
         }
 
-        if($user[0]->status == "deleted") {
+        if ($user[0]->status == "deleted") {
             throw new HTTPException("User not found", 404);
         }
 
@@ -81,10 +82,10 @@ class AccountController extends Controller
         Event::fire(new UserLoggedInEvent($user[0]));
 
         return $response;
-
     }
 
-    public function register(Request $request, Response $response) {
+    public function register(Request $request, Response $response)
+    {
         $request->merge(["name" => strtolower($request->input("name"))]);
         $this->validate($request, [
             'name' => 'required|min:4|max:64|regex:@^[a-z0-9-_+]*$@|unique:users',
@@ -120,15 +121,15 @@ class AccountController extends Controller
         return $response;
     }
 
-    public function getAccount($account_id, Response $response) {
-        if(!Auth::check()) {
+    public function getAccount($account_id, Response $response)
+    {
+        if (!Auth::check()) {
             throw new NotLoggedInException();
         }
 
         $user = User::query()->where("id", "=", $account_id)->first();
 
-        if(!(Auth::user()->admin || (Auth::user()->id === $account_id)))
-        {
+        if (!(Auth::user()->admin || (Auth::user()->id === $account_id))) {
             throw new HTTPException("You have no permission to see this user", 403);
         }
 
@@ -137,8 +138,9 @@ class AccountController extends Controller
         return $response->withData(new \App\Http\Resources\User($user));
     }
 
-    public function getAccountMe(Response $response) {
-        if(!Auth::check()) {
+    public function getAccountMe(Response $response)
+    {
+        if (!Auth::check()) {
             throw new NotLoggedInException();
         }
 

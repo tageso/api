@@ -29,12 +29,12 @@ class EventLogListener
         Log::info("Log Event to MYSQL");
         $eventModel = new \App\Models\Event();
         $eventModel->eventType = get_class($event);
-        if(method_exists($event, "getPayload")) {
+        if (method_exists($event, "getPayload")) {
             $eventModel->payload = \GuzzleHttp\json_encode($event->getPayload());
         } else {
             $eventModel->payload = \GuzzleHttp\json_encode($event);
         }
-        if(method_exists($event, "getObjectId")) {
+        if (method_exists($event, "getObjectId")) {
             $eventModel->eventObjectId = \GuzzleHttp\json_encode($event->getObjectId());
         }
         $eventModel->saveOrFail();

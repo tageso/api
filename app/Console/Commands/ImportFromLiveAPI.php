@@ -51,7 +51,7 @@ class ImportFromLiveAPI extends Command
         $this->info("Create System Users");
 
         $user = User::query()->where("id", 1)->first();
-        if($user === null) {
+        if ($user === null) {
             $user = new User();
             $user->name = "system";
             $user->email = "info@tageso.de";
@@ -78,7 +78,6 @@ class ImportFromLiveAPI extends Command
             $user->status = "active";
             $user->password = hash("sha512", "admin");
             $user->saveOrFail();
-
         }
 
         //Import other users
@@ -89,7 +88,7 @@ class ImportFromLiveAPI extends Command
             'headers' => ['Authorization' => getenv("TMP_LIVE_API")]
         ]);
         $res = json_decode((string)$res->getBody());
-        foreach($res->data as $data) {
+        foreach ($res->data as $data) {
             $user = new User();
             $user->name = $data->username;
             $user->email = $data->mail;
@@ -98,16 +97,16 @@ class ImportFromLiveAPI extends Command
             $user->developer = $data->developer;
             $user->systemAccount = $data->systemAccount;
             $user->status = "active";
-            if($data->openMailCheck) {
+            if ($data->openMailCheck) {
                 $user->status = "validateSend";
                 $user->mailToken = $data->mailCheckToken;
             }
 
-            if($data->delete) {
+            if ($data->delete) {
                 $user->status = "deleted";
             }
             $user->mailStatus = "active";
-            if($data->disabledMails) {
+            if ($data->disabledMails) {
                 $user->mailStatus = "disabled";
             }
             $user->disabledMailsToken = $data->disabledMailsToken;
@@ -116,8 +115,7 @@ class ImportFromLiveAPI extends Command
 
 
             // Create User Profile
-            if($user->status == "active")
-            {
+            if ($user->status == "active") {
                 $userProfile = new UserProfile();
                 $userProfile->username = $data->callName;
                 $userProfile->user_id = $user->id;
@@ -140,13 +138,13 @@ class ImportFromLiveAPI extends Command
         $res = json_decode((string)$res->getBody());
 
 
-        foreach($res->data as $data) {
+        foreach ($res->data as $data) {
             $organisation = new Organisations();
             $organisation->name = $data->name;
             $organisation->public = $data->public;
             $organisation->url = $data->_id;
             $organisation->status = "active";
-            if($data->delete) {
+            if ($data->delete) {
                 $organisation->status = "deleted";
             }
             $organisation->user_id = 1;
@@ -161,14 +159,14 @@ class ImportFromLiveAPI extends Command
         ]);
         $res = json_decode((string)$res->getBody());
 
-        foreach($res->data as $data) {
+        foreach ($res->data as $data) {
             $userOrganisation = new UserOrganisations();
             $user = User::query()->where("old_uid", "=", $data->account)->first();
-            if($user === null) {
+            if ($user === null) {
                 var_dump($data);
                 var_dump($user);
-
             }
+
             $organisation = Organisations::query()->where("old_uid", "=", $data->agenda)->first();
 
             $userOrganisation->user_id = $user->id;
@@ -192,9 +190,9 @@ class ImportFromLiveAPI extends Command
         ]);
         $res = json_decode((string)$res->getBody());
 
-        foreach($res->data as $data) {
+        foreach ($res->data as $data) {
             $organisation = Organisations::query()->where("old_uid", "=", $data->agenda)->first();
-            if($organisation === null) {
+            if ($organisation === null) {
                 $this->warn("Organisation ".$data->agenda." not found");
                 continue;
             }
@@ -202,7 +200,7 @@ class ImportFromLiveAPI extends Command
             $categorie->name = "";
             $categorie->old_uid = $data->_id;
             $categorie->name = $data->name;
-            if($data->position === null) {
+            if ($data->position === null) {
                 $this->warn("Position for Cat ".$data->_id.": ".$data->name." not found");
                 $data->position = 0;
             }
@@ -210,7 +208,7 @@ class ImportFromLiveAPI extends Command
             $categorie->organisation_id = $organisation->id;
             $categorie->user_id = 1;
             $categorie->status = "active";
-            if($data->deleted == true) {
+            if ($data->deleted == true) {
                 $categorie->status = "deleted";
             }
             $categorie->saveOrFail();
@@ -223,18 +221,18 @@ class ImportFromLiveAPI extends Command
         ]);
         $res = json_decode((string)$res->getBody());
 
-        foreach($res->data as $data) {
+        foreach ($res->data as $data) {
             $item = new Item();
             $item->user_id = User::query()->where("old_uid", "=", $data->account)->first()->id;
             $item->category_id = Categories::query()->where("old_uid", "=", $data->category)->first()->id;
             $item->status = "active";
-            if($data->done == true) {
+            if ($data->done == true) {
                 $item->status = "closed";
             }
             $item->name = $data->name;
             $item->description = $data->description;
             $item->position = $data->position;
-            if($item->position === null) {
+            if ($item->position === null) {
                 $item->position = 0;
                 $this->warn("Position for Item ".$item->name." not found");
             }

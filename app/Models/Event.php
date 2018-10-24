@@ -28,5 +28,4 @@ class Event extends Model
     protected $hidden = [
         '',
     ];
-
 }

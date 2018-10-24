@@ -36,12 +36,13 @@ class Categories extends Model
         '',
     ];
 
-    static public function getForOrganisation($organisationId, $pagination = true) {
+    public static function getForOrganisation($organisationId, $pagination = true)
+    {
         $categories = self::query()
             ->where("organisation_id", "=", $organisationId)
             ->where("status", "=", "active")
             ->orderBy("position", "ASC");
-        if($pagination) {
+        if ($pagination) {
             $categories = $categories->paginate(20);
         } else {
             $categories = $categories->get();
@@ -49,8 +50,9 @@ class Categories extends Model
         return $categories;
     }
 
-    public function calculateNexFreePosition() {
-        if(empty($this->organisation_id)) {
+    public function calculateNexFreePosition()
+    {
+        if (empty($this->organisation_id)) {
             throw new HTTPException("No Organisation set, but needed to calculate Position");
         }
 
@@ -59,7 +61,7 @@ class Categories extends Model
             ->orderBy("position", "DESC")
             ->first();
 
-        if($res == null) {
+        if ($res == null) {
             $this->position = 0;
         } else {
             $this->position = $res->position + 1;
@@ -74,9 +76,8 @@ class Categories extends Model
         $v->validate();
 
         $organisation = Organisations::getById($this->organisation_id);
-        if($organisation == null) {
+        if ($organisation == null) {
             throw new \Exception("Organisation not found");
         }
     }
-
 }
