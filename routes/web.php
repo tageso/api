@@ -12,9 +12,9 @@
 */
 
 /* Public Routes */
-$router->get("/test", \App\Http\Controllers\Test\ExampleController::class);
 $router->post("/v2/account/login", ["uses" => 'AccountController@login']);
 $router->post("/v2/account/register", ["uses" => 'AccountController@register']);
+$router->get("/v2/account/validation/{validation_id}/{token}", ["uses" => 'AccountController@validateMail']);
 
 /* Application Routes */
 $router->group(['prefix' => 'v2'], function () use ($router) {

@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Events\OrganisationUpdated;
 use App\Models\Categorie;
 use App\Models\Categories;
+use App\Models\EmailValidation;
 use App\Models\Item;
 use App\Models\Organisations;
 use App\Models\User;

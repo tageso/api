@@ -154,4 +154,34 @@ class AccountController extends Controller
 
         return $this->getAccount(Auth::user()->id, $response);
     }
+
+    public function validateMail($validation_id, $token, Response $response)
+    {
+        $validation = EmailValidation::query()
+            ->where("id", "=", $validation_id)
+            ->where("status", "=", "validationSend")
+            ->first();
+
+        if ($validation === null) {
+            throw new HTTPException("Validation not found", 400);
+        }
+
+        if ($validation->token == $token) {
+            $validation->status = "validated";
+            if ($validation->used_for == "user") {
+                $user = User::query()
+                    ->where("id", "=", $validation->user_id)
+                    ->first();
+                $user->email = $validation->email;
+                $user->status = "active";
+                if ($user->mailStatus == "validateSend") {
+                    $user->mailStatus = "active";
+                }
+                $user->saveOrFail();
+            }
+            $validation->saveOrFail();
+            return $response->withData([]);
+        }
+        throw new HTTPException("Validation not possible", 400);
+    }
 }

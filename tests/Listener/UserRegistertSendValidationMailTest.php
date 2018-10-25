@@ -85,7 +85,7 @@ class UserRegistertSendValidationMailTest extends TestCase
         Queue::fake();
 
         $listener = new \App\Listeners\UserRegistertSendValidationMail();
-       $user = $this->getUser();
+        $user = $this->getUser();
         $event = new \App\Events\UserRegisterEvent($user);
         $listener->handle($event);
 
