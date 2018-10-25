@@ -14,6 +14,9 @@ Current this API is still in development.
 * URL Changes
 * API Return no UserData for other Users just Profile Data
 
+# 2.0.1 (Planed)
+##Changes
+* Remove import from live Command
 # 2.1.0 (Planed)
 
 # 2.2.0 (Planed)
