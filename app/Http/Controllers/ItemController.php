@@ -140,6 +140,35 @@ class ItemController extends BaseController
         return $response->withData(new \App\Http\Resources\Item($item));
     }
 
+    public function closeItem($organisation_id, $item_id, Request $request, Response $response)
+    {
+        if (!Auth::check()) {
+            throw new NotLoggedInException();
+        }
+
+        $access = UserOrganisations::getAccess(Auth::user()->id, $organisation_id);
+
+        if (!$access->edit) {
+            throw new HTTPException("You don't have Permission to change this Item", 403);
+        }
+
+        $item = Item::query()->where("id", "=", $item_id)->first();
+        $category = Categories::query()->where("id", "=", $item->category_id)->first();
+
+        if ($category->organisation_id != $organisation_id) {
+            throw new HTTPException("Item Category not in the Organisation", 400);
+        }
+
+        $changeArray = [];
+        $changeArray["status"] = ["new" => "closed", "old" => $item->status];
+        $item->status = "closed";
+
+        $item->saveOrFail();
+        Event::fire(new ItemUpdated($item, $changeArray));
+
+        return $response->withData(new \App\Http\Resources\Item($item));
+    }
+
     public function detailItemDeprecated($organisation_id, $item_id, Response $response)
     {
         $organisation = Organisations::getById($organisation_id);

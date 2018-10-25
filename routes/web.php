@@ -47,6 +47,7 @@ $router->group(['prefix' => 'v2'], function () use ($router) {
             $router->get("/", ["uses" => 'ItemController@listItems']);
             $router->post("/", ["uses" => 'ItemController@createItem']);
             $router->patch("/{item_id}", ["uses" => "ItemController@updateItem"]);
+            $router->delete("/{item_id}", ["uses" => "ItemController@closeItem"]);
             $router->get("/{item_id}/deprecated", ["uses" => 'ItemController@detailItemDeprecated']);
         });
         $router->group(['prefix' => '/{organisation_id}/access'], function () use ($router) {
