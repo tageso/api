@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\DB;
  *
  * @package App\Console\Commands
  */
-class CleanDeletetAccounts extends Command
+class Setup extends Command
 {
     /**
      * The console command name.
