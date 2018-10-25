@@ -3,11 +3,14 @@
 namespace App\Console\Commands;
 
 use App\Events\OrganisationUpdated;
+use App\Exceptions\HTTPException;
 use App\Models\Categorie;
 use App\Models\Categories;
 use App\Models\EmailValidation;
+use App\Models\Event;
 use App\Models\Item;
 use App\Models\Organisations;
+use App\Models\Protocol;
 use App\Models\User;
 use App\Models\UserLogin;
 use App\Models\UserOrganisations;
@@ -251,6 +254,72 @@ class ImportFromLiveAPI extends Command
             }
             $item->old_uid = $data->_id;
             $item->saveOrFail();
+        }
+
+        $this->info("Migrate Protocols");
+        $res = $client->request('GET', 'https://api.tageso.de/migration/protocol', [
+            'headers' => ['Authorization' => getenv("TMP_LIVE_API")]
+        ]);
+        $res = json_decode((string)$res->getBody());
+
+        foreach ($res->data as $data) {
+            $organisation = Organisations::query()->where("old_uid", "=", $data->agenda)->first();
+            $protocol = new Protocol();
+            $protocol->organisation_id = $organisation->id;
+            $protocol->user_id = User::query()->where("old_uid", "=", $data->accountCreate)->first()->id;
+            $protocol->user_closed = User::query()->where("old_uid", "=", $data->accountClosed)->first()->id;
+            $protocol->status = "open";
+            if ($data->canceld) {
+                $protocol->status = "canceled";
+            }
+
+            if ($data->done && !$data->canceld) {
+                $protocol->status = "closed";
+            }
+            $protocol->start = date("Y-m-d H:i:s", strtotime($data->date));
+            $protocol->ende = date("Y-m-d H:i:s", strtotime($data->date));
+            $protocol->saveOrFail();
+
+            //Categories
+            $position = 0;
+            foreach ($data->agendaItems as $agendaItem) {
+                $this->info("Migrate Categories for ".$organisation->name);
+                $category = Categories::query()->where("old_uid", "=", $agendaItem->_id)->first();
+                if ($category->position != $position) {
+                    $event = new Event();
+                    $event->eventType = "App\Events\CategoryUpdated";
+                    $event->eventObjectId = $category->id;
+                    $changeArray = ["position" => ["old" => $position, "new" => $category->position]];
+                    if ($category->name != $agendaItem->name) {
+                        $changeArray["name"] =["old" => $agendaItem->name, "new" => $category->name];
+                    }
+                    $event->payload = \GuzzleHttp\json_encode(["changes" => $changeArray]);
+                    $event->setCreatedAt(date("Y-m-d H:i:s", strtotime($data->date) - 10));
+                    $event->setUpdatedAt(date("Y-m-d H:i:s", strtotime($data->date) - 10));
+                    $event->saveOrFail();
+                }
+                $itemPosition = 0;
+                foreach ($agendaItem->items as $itemData) {
+                    $item = Item::query()->where("old_uid", "=", $itemData->_id)->first();
+                    if ($item->position != $itemPosition) {
+                        $event = new Event();
+                        $event->eventType = "App\Events\ItemUpdated";
+                        $event->eventObjectId = $item->id;
+                        $changeArray = ["position" => ["old" => $position, "new" => $item->position]];
+                        if ($item->name != $itemData->name) {
+                            $changeArray["name"] =["old" => $itemData->name, "new" => $item->name];
+                        }
+                        if ($item->description != $itemData->description) {
+                            $changeArray["description"] =["old" => $itemData->description, "new" => $item->description];
+                        }
+                        $event->payload = \GuzzleHttp\json_encode(["changes" => $changeArray]);
+                        $event->setCreatedAt(date("Y-m-d H:i:s", strtotime($data->date) - 10));
+                        $event->setUpdatedAt(date("Y-m-d H:i:s", strtotime($data->date) - 10));
+                        $event->saveOrFail();
+                    }
+                }
+                $position++;
+            }
         }
 
 

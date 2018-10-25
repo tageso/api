@@ -79,12 +79,16 @@ class Basics extends Migration
            $table->increments('id');
             $table->timestamps();
            $table->unsignedInteger("user_id");
+            $table->unsignedInteger("user_closed");
            $table->unsignedInteger("organisation_id");
+           $table->enum("status", ["open", "closed", "canceled"])->default("open");
            $table->timestamp("start");
            $table->timestamp("ende")->nullable()->comment("If it null, the protocol is still open");
+            $table->text("old_uid")->nullable()->comment("For Migration from old API");
 
 
            $table->foreign('user_id')->references('id')->on('users');
+            $table->foreign('user_closed')->references('id')->on('users');
            $table->foreign('organisation_id')->references('id')->on('organisations');
         });
 

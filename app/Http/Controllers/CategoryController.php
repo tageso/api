@@ -75,8 +75,10 @@ class CategoryController extends BaseController
         $position = 0;
         foreach ($json["categories"] as $categoryData) {
             $category = Categories::query()->where("id", "=", $categoryData["id"])->first();
+            $changeArray = ["position" => ["old" => $category->position, "new" => $position]];
             $category->position = $position;
             $category->saveOrFail();
+            \event(new CategoryUpdated($category, $changeArray));
             $position++;
         }
     }
