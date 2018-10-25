@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\ItemUpdated;
 use App\Exceptions\HTTPException;
 use App\Exceptions\NotLoggedInException;
 use App\Http\Resources\Access;
@@ -16,6 +17,7 @@ use App\Models\UserOrganisations;
 use App\Models\Users;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Routing\Controller as BaseController;
 use TaGeSo\APIResponse\Response;
 
@@ -98,6 +100,42 @@ class ItemController extends BaseController
         $item->description = $request->input("description", "");
         $item->calculateNexFreePosition();
         $item->saveOrFail();
+
+        return $response->withData(new \App\Http\Resources\Item($item));
+    }
+
+    public function updateItem($organisation_id, $item_id, Request $request, Response $response)
+    {
+        if (!Auth::check()) {
+            throw new NotLoggedInException();
+        }
+
+        $access = UserOrganisations::getAccess(Auth::user()->id, $organisation_id);
+
+        if (!$access->edit) {
+            throw new HTTPException("You don't have Permission to change this Item", 403);
+        }
+
+        $item = Item::query()->where("id", "=", $item_id)->first();
+        $category = Categories::query()->where("id", "=", $item->category_id)->first();
+
+        if ($category->organisation_id != $organisation_id) {
+            throw new HTTPException("Item Category not in the Organisation", 400);
+        }
+
+        $changeArray = [];
+        if ($request->input("name", false)) {
+            $changeArray["name"] = ["old" => $item->name, "new" => $request->input("name")];
+            $item->name =$request->input("name");
+        }
+
+        if ($request->input("description", false)) {
+            $changeArray["description"] = ["old" => $item->description, "new" => $request->input("description")];
+            $item->description =$request->input("description");
+        }
+
+        $item->saveOrFail();
+        Event::fire(new ItemUpdated($item, $changeArray));
 
         return $response->withData(new \App\Http\Resources\Item($item));
     }
