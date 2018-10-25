@@ -1,6 +1,6 @@
 # Current
 Current this API is still in development.
-# 2.0.0 (25.10.2018)
+# 2.0.0 (Planed)
 
 ## Changes
 * **Unstable Version**
