@@ -46,7 +46,7 @@ class UserRegistertSendValidationMail
             ->where("user_id", "=", $event->getUser()->id)
             ->first();
 
-        if($emailValidation == null) {
+        if ($emailValidation == null) {
             throw new \Exception("No open E-Mail Validation for Registration");
         }
         $url = getenv("FRONTEND_URL")."#/activate/".$emailValidation->id."/".$emailValidation->token;
