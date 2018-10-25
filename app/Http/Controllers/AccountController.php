@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Events\NewsEvent;
 use App\Events\UserRegisterEvent;
 use App\Exceptions\NotLoggedInException;
+use App\Models\EmailValidation;
 use App\Models\UserProfile;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -101,7 +102,6 @@ class AccountController extends Controller
         $user->password = hash("sha512", $request->input("password"));
         $user->status = "validateSend";
         $user->mailStatus = "validateSend";
-        $user->generateMailToken();
         $user->generateDisabledMailToken();
         $user->saveOrFail();
 
@@ -110,9 +110,17 @@ class AccountController extends Controller
         $userProfile->user_id = $user->id;
         $userProfile->saveOrFail();
 
+        $emailValidation = new EmailValidation();
+        $emailValidation->user_id = $user->id;
+        $emailValidation->email = $request->input("email");
+        $emailValidation->used_for = "user";
+        $emailValidation->status = "validationSend";
+        $emailValidation->generateToken();
+        $emailValidation->saveOrFail();
+
         Event::fire(new UserRegisterEvent($user));
 
-        $response->withData($user);
+        $response->withData(new \App\Http\Resources\User($user));
 
         DB::commit();
 

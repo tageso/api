@@ -25,10 +25,21 @@ class Users extends Migration
             $table->boolean("admin")->default(false);
             $table->boolean("developer")->default(false);
             $table->boolean("systemAccount")->default(false)->comment("Depricated");
-            $table->enum("mailStatus", ["active", "validateSend", "disabled"])->comment("validationSend comes when the user disabled the mails and want to enabled it again");
-            $table->text("mailToken")->nullable();
+            $table->enum("mailStatus", ["active", "validateSend", "disabled"])->default("validateSend")->comment("validationSend comes when the user disabled the mails and want to enabled it again");
             $table->text("disabledMailsToken")->nullable();
             $table->text("old_uid")->nullable()->comment("For Migration from old API");
+        });
+
+        Schema::create('email_validations', function(Blueprint $table) {
+           $table->increments("id");
+           $table->timestamps();
+           $table->unsignedInteger("user_id");
+           $table->string("email");
+           $table->string("token")->nullable();
+           $table->enum("status", ["validationSend", "validated", "invalid"]);
+           $table->enum("used_for", ["none", "user", "userProfile"])->default("user");
+
+           $table->foreign('user_id')->references('id')->on('users');
         });
 
         Schema::create("twoAuthCallange", function(Blueprint $table) {

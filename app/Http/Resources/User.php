@@ -22,6 +22,7 @@ class User extends JsonResource
             'status' => $this->status,
             'developer' => $this->developer,
             'systemAccount' => $this->systemAccount,
+            'mailStatus' => $this->mailStatus,
 
 
             #'active','validateSend','disabled'

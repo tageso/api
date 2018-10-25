@@ -99,7 +99,6 @@ class ImportFromLiveAPI extends Command
             $user->status = "active";
             if ($data->openMailCheck) {
                 $user->status = "validateSend";
-                $user->mailToken = $data->mailCheckToken;
             }
 
             if ($data->delete) {
@@ -112,6 +111,19 @@ class ImportFromLiveAPI extends Command
             $user->disabledMailsToken = $data->disabledMailsToken;
             $user->old_uid = $data->_id;
             $user->saveOrFail();
+
+            //Create E-Mail Validation Objects
+            $emailValidation = new EmailValidation();
+            $emailValidation->user_id = $user->id;
+            $emailValidation->token = $data->mailCheckToken;
+
+            if ($data->openMailCheck) {
+                $emailValidation->status = "validationSend";
+            } else {
+                $emailValidation->status = "validated";
+            }
+            $emailValidation->used_for = "user";
+            $emailValidation->saveOrFail();
 
 
             // Create User Profile

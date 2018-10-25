@@ -5,11 +5,24 @@ use Laravel\Lumen\Testing\DatabaseTransactions;
 
 class UserRegistertSendValidationMailTest extends TestCase
 {
+    private function getUser() {
+        $user = \App\Models\User::query()->where("name", "=", "admin")->first();
+
+        $emailValidation = new \App\Models\EmailValidation();
+        $emailValidation->user_id = $user->id;
+        $emailValidation->used_for = "user";
+        $emailValidation->email = $user->email;
+        $emailValidation->status = "validationSend";
+        $emailValidation->token = "phpunit";
+        $emailValidation->saveOrFail();
+
+        return $user;
+    }
     public function testJobCreat() {
         Queue::fake();
 
         $listener = new \App\Listeners\UserRegistertSendValidationMail();
-        $user = \App\Models\User::query()->where("name", "=", "admin")->first();
+        $user = $this->getUser();
         $event = new \App\Events\UserRegisterEvent($user);
         $listener->handle($event);
 
@@ -20,7 +33,7 @@ class UserRegistertSendValidationMailTest extends TestCase
         Queue::fake();
 
         $listener = new \App\Listeners\UserRegistertSendValidationMail();
-        $user = \App\Models\User::query()->where("name", "=", "admin")->first();
+        $user = $this->getUser();
         $event = new \App\Events\UserRegisterEvent($user);
         $listener->handle($event);
 
@@ -33,7 +46,7 @@ class UserRegistertSendValidationMailTest extends TestCase
         Queue::fake();
 
         $listener = new \App\Listeners\UserRegistertSendValidationMail();
-        $user = \App\Models\User::query()->where("name", "=", "admin")->first();
+        $user = $this->getUser();
         $event = new \App\Events\UserRegisterEvent($user);
         $listener->handle($event);
 
@@ -46,7 +59,7 @@ class UserRegistertSendValidationMailTest extends TestCase
         Queue::fake();
 
         $listener = new \App\Listeners\UserRegistertSendValidationMail();
-        $user = \App\Models\User::query()->where("name", "=", "admin")->first();
+        $user = $this->getUser();
         $event = new \App\Events\UserRegisterEvent($user);
         $listener->handle($event);
 
@@ -59,7 +72,7 @@ class UserRegistertSendValidationMailTest extends TestCase
         Queue::fake();
 
         $listener = new \App\Listeners\UserRegistertSendValidationMail();
-        $user = \App\Models\User::query()->where("name", "=", "admin")->first();
+        $user = $this->getUser();
         $event = new \App\Events\UserRegisterEvent($user);
         $listener->handle($event);
 
@@ -72,7 +85,7 @@ class UserRegistertSendValidationMailTest extends TestCase
         Queue::fake();
 
         $listener = new \App\Listeners\UserRegistertSendValidationMail();
-        $user = \App\Models\User::query()->where("name", "=", "admin")->first();
+       $user = $this->getUser();
         $event = new \App\Events\UserRegisterEvent($user);
         $listener->handle($event);
 

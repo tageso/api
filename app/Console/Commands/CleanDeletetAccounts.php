@@ -56,7 +56,6 @@ class CleanDeletetAccounts extends Command
                 $user->developer = 0;
                 $user->systemAccount = 0;
                 $user->mailStatus = "disabled";
-                $user->mailToken = "";
                 $user->disabledMailsToken = "";
                 //$user->name = hash("sha512", $user->name); // @todo add again disabled for now
                 $user->save();

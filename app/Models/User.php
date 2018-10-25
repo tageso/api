@@ -16,8 +16,8 @@ use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
  * @property string $email
  * @property string $password
  * @property string $disabledMailsToken
- * @property string $mailToken
- * @property string status
+ * @property string $status
+ * @property string $mailStatus
  */
 class User extends Model implements AuthenticatableContract, AuthorizableContract
 {
@@ -31,7 +31,7 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
      * @var array
      */
     protected $fillable = [
-        'id', 'name', 'email',
+        'id', 'name', 'email', 'mailStatus'
     ];
 
     /**
@@ -43,17 +43,6 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         'password', 'disabledMailsToken', 'mailToken'
     ];
 
-
-    public function generateMailToken($length = 25)
-    {
-        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        $charactersLength = strlen($characters);
-        $randomString = '';
-        for ($i = 0; $i < $length; $i++) {
-            $randomString .= $characters[rand(0, $charactersLength - 1)];
-        }
-        $this->mailToken = $randomString;
-    }
 
     public function generateDisabledMailToken($length = 25)
     {
