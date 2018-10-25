@@ -17,11 +17,12 @@ then
 fi
 
 echo "Start Release in 10 Secounds";
+sleep 10
 exit
 # Update Version
 currentDate=`date +%d.%m.%Y`
 
-sed -i "s/# 2.0.0/# 2.0.0 ($currentDate)/" docs/docs/version.md
+sed -i "s/# $1/# $1 ($currentDate)/" docs/docs/version.md
 
 rm -r -v VERSION
 echo $1 > VERSION
