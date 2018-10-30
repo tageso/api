@@ -68,6 +68,11 @@ class Categories extends Model
         }
     }
 
+    public static function getForDate($id, $date)
+    {
+        return null;
+    }
+
     public function validate($data)
     {
         // make a new validator object

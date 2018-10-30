@@ -79,7 +79,7 @@ class Basics extends Migration
            $table->increments('id');
             $table->timestamps();
            $table->unsignedInteger("user_id");
-            $table->unsignedInteger("user_closed");
+            $table->unsignedInteger("user_closed")->nullable()->default(null);
            $table->unsignedInteger("organisation_id");
            $table->enum("status", ["open", "closed", "canceled"])->default("open");
            $table->timestamp("start");

@@ -61,6 +61,7 @@ $router->group(['prefix' => 'v2'], function () use ($router) {
         });
         $router->group(['prefix' => '/{organisation_id}/protocol'], function () use ($router) {
             $router->get("/", ["uses" => 'ProtocolController@listProtocols']);
+            $router->post("/", ["uses" => 'ProtocolController@createProtocol']);
         });
     });
 });
