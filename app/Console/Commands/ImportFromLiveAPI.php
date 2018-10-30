@@ -294,8 +294,8 @@ class ImportFromLiveAPI extends Command
                         $changeArray["name"] =["old" => $agendaItem->name, "new" => $category->name];
                     }
                     $event->payload = \GuzzleHttp\json_encode(["changes" => $changeArray]);
-                    $event->setCreatedAt(date("Y-m-d H:i:s", strtotime($data->date) - 10));
-                    $event->setUpdatedAt(date("Y-m-d H:i:s", strtotime($data->date) - 10));
+                    $event->setCreatedAt(date("Y-m-d H:i:s", strtotime($data->date) + 10));
+                    $event->setUpdatedAt(date("Y-m-d H:i:s", strtotime($data->date) + 10));
                     $event->saveOrFail();
                 }
                 $itemPosition = 0;
@@ -313,8 +313,8 @@ class ImportFromLiveAPI extends Command
                             $changeArray["description"] =["old" => $itemData->description, "new" => $item->description];
                         }
                         $event->payload = \GuzzleHttp\json_encode(["changes" => $changeArray]);
-                        $event->setCreatedAt(date("Y-m-d H:i:s", strtotime($data->date) - 10));
-                        $event->setUpdatedAt(date("Y-m-d H:i:s", strtotime($data->date) - 10));
+                        $event->setCreatedAt(date("Y-m-d H:i:s", strtotime($data->date) + 10));
+                        $event->setUpdatedAt(date("Y-m-d H:i:s", strtotime($data->date) + 10));
                         $event->saveOrFail();
                     }
                 }

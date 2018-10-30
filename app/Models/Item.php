@@ -58,4 +58,22 @@ class Item extends Model
         }
         return $this->position;
     }
+
+    public static function getForDate($id, $date)
+    {
+        $object = self::query()->where("id", "=", $id)->first();
+        $events = Event::query()
+            ->where("eventType", "=", "App\Events\ItemUpdated")
+            ->where("eventObjectId", "=", $id)
+            ->get();
+
+        foreach ($events as $event) {
+            $changes = \GuzzleHttp\json_decode($event->payload);
+            foreach ($changes->changes as $key => $value) {
+                $object->$key = $value->old;
+            }
+        }
+
+        return $object;
+    }
 }
