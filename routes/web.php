@@ -63,8 +63,13 @@ $router->group(['prefix' => 'v2'], function () use ($router) {
             $router->get("/", ["uses" => 'ProtocolController@listProtocols']);
             $router->post("/", ["uses" => 'ProtocolController@createProtocol']);
             $router->group(['prefix' => '/open'], function () use ($router) {
+                $router->delete("/deprecated", ["uses" => "ProtocolController@cancelProtocol"]);
+                $router->post("/deprecated", ["uses" => "ProtocolController@saveProtocolItems"]);
+                $router->post("/save/deprecated", ["uses" => "ProtocolController@saveProtocolItemsAndClose"]);
                 $router->get("/deprecated", ["uses" => "AgendaController@getAgendProtocolDeprecated"]);
             });
+            $router->get("/{protocol_id}/deprecated", ["uses" => 'ProtocolController@getProtocolDeprecated']);
+
         });
     });
 });

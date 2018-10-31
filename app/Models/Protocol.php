@@ -40,4 +40,13 @@ class Protocol extends Model
     protected $hidden = [
 
     ];
+
+
+    public static function getOpenProtocol(int $organisation_id)
+    {
+        return self::query()
+            ->where("organisation_id", "=", $organisation_id)
+            ->where("status", "=", "open")
+            ->first();
+    }
 }

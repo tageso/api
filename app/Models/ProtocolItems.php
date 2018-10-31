@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Auth\Authenticatable;
+use Illuminate\Support\Facades\Auth;
 use Laravel\Lumen\Auth\Authorizable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
@@ -38,4 +39,20 @@ class ProtocolItems extends Model
     protected $hidden = [
 
     ];
+
+    public static function getItemForProtocol(int $item_id, int $protocol_id) : ProtocolItems
+    {
+        $item = self::query()
+            ->where("protocol_id", "=", $protocol_id)
+            ->where("item_id", "=", $item_id)
+            ->first();
+        if ($item == null) {
+            $item = new ProtocolItems();
+            $item->protocol_id = $protocol_id;
+            $item->item_id = $item_id;
+            $item->user_id = Auth::user()->id;
+        }
+
+        return $item;
+    }
 }

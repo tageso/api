@@ -4,12 +4,19 @@ namespace App\Http\Controllers;
 
 use App\Exceptions\HTTPException;
 use App\Exceptions\NotLoggedInException;
+use App\Http\Resources\ProtocolItem;
 use App\Models\Categories;
+use App\Models\Item;
 use App\Models\Organisations;
 use App\Models\Protocol;
+use App\Models\ProtocolItems;
+use App\Models\User;
 use App\Models\UserOrganisations;
+use App\Models\UserProfile;
 use App\Models\Users;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Laravel\Lumen\Routing\Controller as BaseController;
 use TaGeSo\APIResponse\Response;
 
@@ -78,10 +85,14 @@ class ProtocolController extends BaseController
         return $response->withData(new \App\Http\Resources\Protocol($protocol))->setStatusCode(201);
     }
 
-    public function getProtocolDeprecated($organisation_id, $protocol_id)
+    public function getProtocolDeprecated($organisation_id, $protocol_id, Response $response)
     {
         $organisation = Organisations::getById($organisation_id);
-        $protocol = Protocol::query()->where("id", "=", $protocol)->first();
+        $protocol = Protocol::query()->where("id", "=", $protocol_id)->first();
+
+        if ($protocol->organisation_id != $organisation_id) {
+            throw new HTTPException("Organisation has not this Protocol", 400);
+        }
 
         if ($organisation->public == false) {
             if (!Auth::check()) {
@@ -101,9 +112,157 @@ class ProtocolController extends BaseController
         $categories = [];
         $categoriesList = Categories::getForOrganisation($organisation_id, false);
 
-        //Get Caregories for Date
+        //Get Categories for Date
         foreach ($categoriesList as $category) {
-            $categories[] = Categories::getForDate($category->id, $protocol->ende);
+            $cat = Categories::getForDate($category->id, $protocol->ende);
+            if ($cat->status == "active") {
+                $categories[] = $cat;
+            }
         }
+
+        usort($categories, [$this, 'sortByPosition']);
+
+
+        $items = Item::getAllForOrganisation($organisation_id);
+        foreach ($items as $itemData) {
+            $protocolItem = ProtocolItems::query()
+                ->where("item_id", "=", $itemData->id)
+                ->where("protocol_id", "=", $protocol->id)
+                ->first();
+            if ($protocolItem != null) {
+                $item = Item::getForDate($itemData->id, $protocol->ende);
+                $item->protocol = new ProtocolItem($protocolItem);
+                $itemsPerCat[$item->category_id][] = $item;
+            }
+        }
+
+        $resCategories = [];
+        foreach ($categories as $category) {
+            if (isset($itemsPerCat[$category->id])) {
+                usort($itemsPerCat[$category->id], [$this, 'sortByPosition']);
+                $category->items = $itemsPerCat[$category->id];
+                $resCategories[] = $category;
+            }
+        }
+
+
+        $res["agenda"] = $organisation->id;
+        $d = new \DateTime($protocol->ende);
+        $d->setTimezone(new \DateTimeZone('Europe/Berlin'));
+        $res["date"] = $d->format("d.m.Y H:i e");
+        $res["done"] = true;
+        $res["canceld"] = false;
+        try {
+            $res["accountCreateCallName"] = User::getById($protocol->user_id)->getProfile()->username;
+        } catch (\Exception $e) {
+            $res["accountCreateCallName"] = "Unknown";
+        }
+        try {
+            $res["accountClosedCallName"] = User::getById($protocol->user_closed)->getProfile()->username;
+        } catch (\Exception $e) {
+            $res["accountClosedCallName"] = "Unknown";
+        }
+        #var_dump($categories);exit();
+        $res["agendaItems"] = $resCategories;
+
+        return $response->withData($res);
+    }
+
+    private function sortByPosition($a, $b)
+    {
+        if ($a->position == $b->position) {
+            Log::warning("To Objects has the same position");
+            return 0;
+        }
+        $res = ($a->position < $b->position) ? -1 : 1;
+        return $res;
+    }
+
+    public function saveProtocolItems($organisation_id, Request $request, Response $response)
+    {
+        Log::debug("Save Protocol Items");
+        if (!Auth::check()) {
+            throw new NotLoggedInException();
+        }
+
+        #$organisation = Organisations::getById($organisation_id);
+        $organisationAccess = UserOrganisations::getAccess(Auth::user()->id, $organisation_id);
+
+        Log::debug("Protocol Access: ".$organisationAccess->protocol);
+
+        if (!$organisationAccess->protocol) {
+            throw new HTTPException("You don't have the permission to save Protocol Items", 403);
+        }
+
+        $protocol = Protocol::getOpenProtocol($organisation_id);
+
+        $input = json_decode($request->getContent());
+
+        Log::debug("Protocol start: ".$protocol->start);
+
+        foreach ($input->items as $itemData) {
+            $protocolItem = ProtocolItems::getItemForProtocol($itemData->id, $protocol->id);
+            $protocolItem->description = $itemData->text;
+            $protocolItem->markedAsClosed = $itemData->close;
+            $protocolItem->saveOrFail();
+        }
+
+        return $response;
+    }
+
+    public function saveProtocolItemsAndClose($organisation_id, Request $request, Response $response)
+    {
+        Log::debug("Save Protocol Items");
+        if (!Auth::check()) {
+            throw new NotLoggedInException();
+        }
+
+        #$organisation = Organisations::getById($organisation_id);
+        $organisationAccess = UserOrganisations::getAccess(Auth::user()->id, $organisation_id);
+
+        Log::debug("Protocol Access: ".$organisationAccess->protocol);
+
+        if (!$organisationAccess->protocol) {
+            throw new HTTPException("You don't have the permission to save Protocol Items", 403);
+        }
+
+        $protocol = Protocol::getOpenProtocol($organisation_id);
+
+        $input = json_decode($request->getContent());
+
+        Log::debug("Protocol start: ".$protocol->start);
+
+        foreach ($input->items as $itemData) {
+            $protocolItem = ProtocolItems::getItemForProtocol($itemData->id, $protocol->id);
+            $protocolItem->description = $itemData->text;
+            $protocolItem->markedAsClosed = $itemData->close;
+            $protocolItem->saveOrFail();
+        }
+
+        $protocol->status = "closed";
+        $protocol->ende = date("Y-m-d H:i:s e");
+        $protocol->user_closed = Auth::user()->id;
+        $protocol->saveOrFail();
+
+        return $response;
+    }
+
+    public function cancelProtocol($organisation_id)
+    {
+        if (!Auth::check()) {
+            throw new NotLoggedInException();
+        }
+
+        $organisationAccess = UserOrganisations::getAccess(Auth::user()->id, $organisation_id);
+
+        if (!$organisationAccess->protocol) {
+            throw new HTTPException("You don't have the permission to save Protocol Items", 403);
+        }
+
+        $protocol = Protocol::getOpenProtocol($organisation_id);
+        $protocol->status = "canceled";
+        $protocol->ende = date("Y-m-d H:i:s e");
+        $protocol->user_closed = Auth::user()->id;
+        $protocol->saveOrFail();
     }
 }

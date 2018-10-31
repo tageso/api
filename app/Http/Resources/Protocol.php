@@ -18,7 +18,7 @@ class Protocol extends JsonResource
     {
         $old = false;
 
-        if (strtotime($this->start) + (60*60*3) < time() && $this->status = "open") {
+        if (strtotime($this->start) + (60*60*3) < time() && $this->status == "open") {
             $old = true;
         }
 

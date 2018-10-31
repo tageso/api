@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Auth\Authenticatable;
+use Illuminate\Support\Facades\Log;
 use Laravel\Lumen\Auth\Authorizable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
@@ -40,6 +41,22 @@ class Item extends Model
 
     ];
 
+    public static function getAllForOrganisation($organisation_id)
+    {
+        $categories = Categories::query()->where("organisation_id", "=", $organisation_id)->get(["id"]);
+        $catIds = [];
+
+        foreach ($categories as $category) {
+            $catIds[] = $category->id;
+        }
+
+        $items = self::query()
+            ->whereIn("category_id", $catIds)
+            ->get();
+
+        return $items;
+    }
+
     public function calculateNexFreePosition()
     {
         if (empty($this->category_id)) {
@@ -65,7 +82,10 @@ class Item extends Model
         $events = Event::query()
             ->where("eventType", "=", "App\Events\ItemUpdated")
             ->where("eventObjectId", "=", $id)
+            ->where("created_at", ">", date("Y-m-d H:i:s e", strtotime($date)))
             ->get();
+
+        Log::debug("Found ".count($events)." Events for Item");
 
         foreach ($events as $event) {
             $changes = \GuzzleHttp\json_decode($event->payload);

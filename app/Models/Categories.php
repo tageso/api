@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Exceptions\HTTPException;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 /**
@@ -68,9 +69,29 @@ class Categories extends Model
         }
     }
 
-    public static function getForDate($id, $date)
+    public static function getForDate($id, $date) : Categories
     {
-        return null;
+        Log::debug("Get Category ".$id." for Date ".$date);
+        $object = self::query()->where("id", "=", $id)->first();
+
+        $eventQuery = Event::query()
+            ->where("eventType", "=", "App\Events\CategoryUpdated")
+            ->where("created_at", ">", date("Y-m-d H:i:s e", strtotime($date)))
+            ->where("eventObjectId", "=", $id);
+
+        $events = $eventQuery->get();
+
+        
+        Log::debug("Found ".count($events)." events for Category");
+
+        foreach ($events as $event) {
+            $changes = \GuzzleHttp\json_decode($event->payload);
+            foreach ($changes->changes as $key => $value) {
+                $object->$key = $value->old;
+            }
+        }
+
+        return $object;
     }
 
     public function validate($data)

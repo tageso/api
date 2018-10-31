@@ -66,4 +66,11 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         }
         return $this->profile;
     }
+
+    public static function getById($id) : User
+    {
+        return self::query()
+            ->where("id", "=", $id)
+            ->first();
+    }
 }
