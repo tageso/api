@@ -11,6 +11,7 @@ use App\Models\Event;
 use App\Models\Item;
 use App\Models\Organisations;
 use App\Models\Protocol;
+use App\Models\ProtocolItems;
 use App\Models\User;
 use App\Models\UserLogin;
 use App\Models\UserOrganisations;
@@ -21,9 +22,9 @@ use Illuminate\Support\Facades\DB;
 // app components
 
 /**
- * Exports all open salesOrder
+ * Import the Data from the current LIVE-API
  *
- * @author Horst Schwarz <horst.schwarz@idealo.de>
+ * This is a temporary API Function.
  *
  * @package App\Console\Commands
  */
@@ -278,6 +279,7 @@ class ImportFromLiveAPI extends Command
             }
             $protocol->start = date("Y-m-d H:i:s", strtotime($data->date));
             $protocol->ende = date("Y-m-d H:i:s", strtotime($data->date));
+            $protocol->old_uid = $data->_id;
             $protocol->saveOrFail();
 
             //Categories
@@ -322,78 +324,28 @@ class ImportFromLiveAPI extends Command
             }
         }
 
-
-        /*
-
-        //Get Organisations
-        $this->info("Migrate Organisations");
-        $res = $client->request('GET', 'https://api.tageso.de/v1/agenda', [
+        $this->info("Migrate Protocol Items");
+        $res = $client->request('GET', 'https://api.tageso.de/migration/protocoentry', [
             'headers' => ['Authorization' => getenv("TMP_LIVE_API")]
         ]);
         $res = json_decode((string)$res->getBody());
-        foreach($res->data as $data) {
-            $organisation = new Organisations();
-            $organisation->name = $data->name;
-            $organisation->user_id = 1;
-            $organisation->public = $data->public;
-            $organisation->url = $data->_id;
-            $organisation->status = "aktive";
-            $organisation->save();
-            $organisation->organisation_id = $organisation->id;
-            $organisation->save();
-        }
-
-        $this->info("Migrate Categories and Items");
-        $organisations = Organisations::all();
-        foreach($organisations as $organisation) {
-            $res = $client->request('GET', 'https://api.tageso.de/v1/agenda/'.$organisation->url.'/categories', [
-                'headers' => ['Authorization' => getenv("TMP_LIVE_API")]
-            ]);
-            $res = json_decode((string)$res->getBody());
-            foreach($res->data as $cat) {
-                $categorie = new Categorie();
-                $categorie->name = $cat->name;
-                $categorie->position = $cat->position;
-                if($categorie->deleted == false) {
-                    $categorie->status = "aktive";
-                }
-                $categorie->user_id = "1";
-                $categorie->organisation_id = $organisation->id;
-                $categorie->save();
-                $categorie->categorie_id = $categorie->id;
-                $categorie->save();
-
-                $res = $client->request('GET', 'https://api.tageso.de/v1/agenda/'.$organisation->url.'/items', [
-                    'headers' => ['Authorization' => getenv("TMP_LIVE_API")]
-                ]);
-                $res2 = json_decode((string)$res->getBody());
-
-                foreach($res2->data as $apiItem) {
-                    if($cat->_id == $apiItem->category) {
-                        $item = new Item();
-                        $item->user_id = "1";
-                        $item->category_id = $categorie->categorie_id;
-                        $item->status = "aktive";
-                        if($apiItem->done == true)
-                        {
-                            $item->status = "closed";
-                        }
-                        $item->name = $apiItem->name;
-                        $item->description = $apiItem->description;
-                        $item->position = $apiItem->position;
-                        if(empty($item->position)) {
-                            $item->position = 0;
-                        }
-                        $item->save();
-                        $item->item_id = $item->id;
-                        $item->save();
-
-                    }
-                }
-
+        foreach ($res->data as $data) {
+            if ($data->text == "" && $data->close == false) {
+                $this->warn("Empty and unclosed Protocol entry");
+                continue;
             }
+            $protocol = Protocol::query()->where("old_uid", "=", $data->protocol)->first();
+            $user = User::query()->where("old_uid", "=", $data->autor)->first();
+            $item = Item::query()->where("old_uid", "=", $data->agendaItem)->first();
 
+            $protocolItem = new ProtocolItems();
+            $protocolItem->user_id = $user->id;
+            $protocolItem->protocol_id = $protocol->id;
+            $protocolItem->old_uid = $data->_id;
+            $protocolItem->item_id = $item->id;
+            $protocolItem->description = $data->text;
+            $protocolItem->markedAsClosed = $data->close;
+            $protocolItem->saveOrFail();
         }
-        */
     }
 }

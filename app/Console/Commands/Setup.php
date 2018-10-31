@@ -14,9 +14,8 @@ use Illuminate\Support\Facades\DB;
 // app components
 
 /**
- * Exports all open salesOrder
  *
- * @author Horst Schwarz <horst.schwarz@idealo.de>
+ * Setup
  *
  * @package App\Console\Commands
  */

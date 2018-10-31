@@ -100,22 +100,13 @@ class Basics extends Migration
            $table->unsignedInteger("item_id");
            $table->longText("description");
            $table->boolean("markedAsClosed");
+            $table->text("old_uid")->nullable()->comment("For Migration from old API");
 
            $table->foreign('user_id')->references('id')->on('users');
            $table->foreign('protocol_id')->references('id')->on('protocols');
            $table->foreign('item_id')->references('id')->on('items');
         });
 
-        Schema::create("news", function(Blueprint $table) {
-           $table->increments("id");
-           $table->timestamps();
-           $table->unsignedInteger("user_id");
-           $table->string("title");
-           $table->string("link")->nullable();
-           $table->longText("description")->nullable();
-
-           $table->foreign('user_id')->references('id')->on('users');
-        });
 
 
     }

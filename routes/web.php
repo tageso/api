@@ -62,6 +62,9 @@ $router->group(['prefix' => 'v2'], function () use ($router) {
         $router->group(['prefix' => '/{organisation_id}/protocol'], function () use ($router) {
             $router->get("/", ["uses" => 'ProtocolController@listProtocols']);
             $router->post("/", ["uses" => 'ProtocolController@createProtocol']);
+            $router->group(['prefix' => '/open'], function () use ($router) {
+                $router->get("/deprecated", ["uses" => "AgendaController@getAgendProtocolDeprecated"]);
+            });
         });
     });
 });

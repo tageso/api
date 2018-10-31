@@ -36,6 +36,8 @@ class Item extends JsonResource
             )->id
             ,
             "done" => ($this->status == "closed") ? true : false,
+            "text" => $this->text,
+            "close" => $this->close
         ];
         return $res;
     }

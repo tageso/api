@@ -12,6 +12,8 @@ use App\Http\Resources\Organisation;
 use App\Models\Categories;
 use App\Models\Item;
 use App\Models\Organisations;
+use App\Models\Protocol;
+use App\Models\ProtocolItems;
 use App\Models\UserOrganisations;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
@@ -143,6 +145,69 @@ class AgendaController extends Controller
                 $itemPosition++;
             }
         }
+    }
+
+    public function getAgendProtocolDeprecated($organisation_id, Response $response)
+    {
+        $id = $organisation_id;
+        Log::debug("Get Agenda ".$id);
+        $organisation = Organisations::getById($id);
+        Log::debug("Found Organisation: ".$organisation->name." (".$organisation->id.")");
+        if ($organisation == null) {
+            throw new HTTPException("Organisation not found", 404);
+        }
+
+        if (!$organisation->public) {
+            if (!Auth::check()) {
+                throw new NotLoggedInException();
+            }
+
+            $organisationAuth = UserOrganisations::getAccess(Auth::user()->id, $organisation->id);
+
+            if ($organisationAuth == null || $organisationAuth->access == false || $organisationAuth->read == false) {
+                throw new HTTPException("You don't have permission to see this Page", 403);
+            }
+        } else {
+            Log::debug("Organisation public");
+        }
+
+
+        $categories = Categories::getForOrganisation($organisation->id);
+
+        Log::debug("Found ".count($categories)." Categories");
+
+        $protocol = Protocol::query()
+            ->where("organisation_id", "=", $organisation_id)
+            ->where("status", "=", "open")
+            ->first();
+
+        if ($protocol == null) {
+            throw new HTTPException("No open Protocol found", 400);
+        }
+
+        foreach ($categories as $category) {
+            $category->items = Item::query()
+                ->where("category_id", "=", $category->id)
+                ->where("status", "=", "active")
+                ->orderBy("position", "ASC")
+                ->get();
+
+            $category->openItemsCount = count($category->items);
+
+            foreach ($category->items as $item) {
+                $protocolItem = ProtocolItems::query()
+                    ->where("item_id", "=", $item->id)
+                    ->where("protocol_id", "=", $protocol->id)
+                    ->first();
+                if ($protocolItem == null) {
+                    continue;
+                }
+                $item->text = $protocolItem->description;
+                $item->close = $protocolItem->markedAsClosed;
+            }
+        }
+
+        return $response->withData(Category::collection($categories));
     }
 
     public function oldAgendaCall($id, Request $request, Response $response)

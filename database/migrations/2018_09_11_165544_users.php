@@ -42,14 +42,6 @@ class Users extends Migration
            $table->foreign('user_id')->references('id')->on('users');
         });
 
-        Schema::create("twoAuthCallange", function(Blueprint $table) {
-            $table->increments('id');
-            $table->timestamps();
-            $table->unsignedInteger("user_id");
-
-            $table->foreign('user_id')->references('id')->on('users');
-        });
-
         Schema::create('user_profiles', function(Blueprint $table) {
            $table->increments('id');
            $table->timestamps();
