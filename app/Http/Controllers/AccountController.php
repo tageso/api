@@ -124,7 +124,7 @@ class AccountController extends Controller
 
         DB::commit();
 
-        Event::fire(new NewsEvent($user, "Herzlich Wilkommen", "Wilkommen bei TaGeSo"));
+        Event::fire(new NewsEvent($user->id, $user->id, "newAccount"));
 
         return $response;
     }
