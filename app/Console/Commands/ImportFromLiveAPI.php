@@ -2,10 +2,12 @@
 
 namespace App\Console\Commands;
 
+use App\Events\NewsEvent;
 use App\Events\OrganisationUpdated;
 use App\Exceptions\HTTPException;
 use App\Models\Categorie;
 use App\Models\Categories;
+use App\Models\Comments;
 use App\Models\EmailValidation;
 use App\Models\Event;
 use App\Models\Item;
@@ -51,6 +53,7 @@ class ImportFromLiveAPI extends Command
      */
     public function handle(\GuzzleHttp\Client $client): void
     {
+        $start = time();
         $this->call('migrate:fresh');
 
         $this->info("Create System Users");
@@ -347,5 +350,60 @@ class ImportFromLiveAPI extends Command
             $protocolItem->markedAsClosed = $data->close;
             $protocolItem->saveOrFail();
         }
+
+        $this->info("Migrate Comments for Items");
+        $res = $client->request('GET', 'https://api.tageso.de/migration/comments', [
+            'headers' => ['Authorization' => getenv("TMP_LIVE_API")]
+        ]);
+        $res = json_decode((string)$res->getBody());
+        foreach ($res->data as $data) {
+            $comment = new Comments();
+            $item = Item::query()->where("old_uid", "=", $data->agendaItem)->first();
+            $user = User::query()->where("old_uid", "=", $data->account)->first();
+
+            $comment->user_id = $user->id;
+            $comment->item_id = $item->id;
+            $comment->text = $data->text;
+            $comment->setCreatedAt(date("Y-m-d H:i:s", $data->date));
+            $comment->setUpdatedAt(date("Y-m-d H:i:s", $data->date));
+            $comment->old_uid = $data->_id;
+            $comment->saveOrFail();
+        }
+
+        $this->info("Migrate Notifications");
+        $res = $client->request('GET', 'https://api.tageso.de/migration/notifications', [
+            'headers' => ['Authorization' => getenv("TMP_LIVE_API")]
+        ]);
+        $res = json_decode((string)$res->getBody());
+        foreach ($res->data as $data) {
+            $target = User::query()->where("old_uid", "=", $data->targetAccount)->first();
+            $user = User::query()->where("old_uid", "=", $data->account)->first();
+            $organisation = Organisations::query()->where("old_uid", "=", $data->agenda)->first();
+
+            $newsEvent = new NewsEvent($user->id, $target->id, $data->typ);
+            $newsEvent->overwriteTimestamp($data->date);
+            $newsEvent->setOrganisation($organisation->id);
+
+
+            if ($data->agendaItem != null) {
+                $agendaI = Item::query()->where("old_uid", "=", $data->agendaItem)->first();
+                $newsEvent->setItem($agendaI->id);
+            }
+
+
+            if (isset($data->payload->protocolID)) {
+                $protocol = Protocol::query()->where("old_uid", "=", $data->payload->protocolID)->first();
+                $newsEvent->setProtocol($protocol->id);
+            }
+
+            if (isset($data->payload->comment)) {
+                $newsEvent->setText($data->payload->comment);
+            }
+
+            event($newsEvent);
+        }
+
+        $dauer = time() - $start;
+        $this->info("Dauer Migration der Daten aus dem Live System: ".$dauer." Sekunden");
     }
 }

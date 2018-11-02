@@ -34,6 +34,7 @@ class ProtocolController extends BaseController
             $organisationAuth = UserOrganisations::query()
                 ->where("user_id", "=", Auth::user()->id)
                 ->where("organisation_id", "=", $id)
+                ->orderBy("id", "DESCp")
                 ->first();
 
             if ($organisationAuth == null || $organisationAuth->access == false || $organisationAuth->read == false) {

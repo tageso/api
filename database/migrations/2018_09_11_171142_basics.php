@@ -107,6 +107,18 @@ class Basics extends Migration
            $table->foreign('item_id')->references('id')->on('items');
         });
 
+        Schema::create("comments", function(Blueprint $table) {
+            $table->increments('id');
+            $table->timestamps();
+            $table->unsignedInteger("item_id");
+            $table->unsignedInteger("user_id");
+            $table->longText("text");
+            $table->text("old_uid")->nullable()->comment("For Migration from old API");
+
+            $table->foreign('user_id')->references('id')->on('users');
+            $table->foreign('item_id')->references('id')->on('items');
+
+        });
 
 
     }

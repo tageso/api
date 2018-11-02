@@ -32,7 +32,8 @@ class EventServiceProvider extends ServiceProvider
             'App\Listeners\EventLogListener'
         ],
         'App\Events\NewsEvent' => [
-            'App\Listeners\NewsListener'
+            #'App\Listeners\NewsListener', # Dont use this now
+            'App\Listeners\EventLogListener'
         ]
 
 
