@@ -14,7 +14,12 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         'App\Console\Commands\ImportFromLiveAPI',
-        \App\Console\Commands\CleanDeletetAccounts::class
+        \App\Console\Commands\CleanDeletetAccounts::class,
+        \App\Console\Commands\ExportPDF::class,
+        \App\Console\Commands\ExportDOCx::class,
+        \App\Console\Commands\ExportODT::class,
+        \App\Console\Commands\ExportAll::class,
+        \App\Console\Commands\ExportEverything::class,
     ];
 
     /**

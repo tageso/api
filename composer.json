@@ -13,7 +13,10 @@
         "squizlabs/php_codesniffer": "*",
         "tageso/api-response": "*",
         "twig/twig": "^2.0",
-        "vlucas/phpdotenv": "~2.2"
+        "vlucas/phpdotenv": "~2.2",
+        "phpoffice/phpword": "^0.15.0@dev",
+        "dompdf/dompdf": "dev-master",
+        "aws/aws-sdk-php": "^3.0@dev"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",

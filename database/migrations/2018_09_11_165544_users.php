@@ -54,7 +54,7 @@ class Users extends Migration
         Schema::create("user_logins", function(Blueprint $table) {
             $table->timestamps();
             $table->unsignedInteger("user_id")->nullable();
-            $table->timestamp("login");
+            $table->dateTime("login")->nullable();
 
             $table->foreign('user_id')->references('id')->on('users');
         });

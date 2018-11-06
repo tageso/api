@@ -97,6 +97,9 @@ class ImportFromLiveAPI extends Command
         ]);
         $res = json_decode((string)$res->getBody());
         foreach ($res->data as $data) {
+            if (empty($data->mail)) {
+                continue;
+            }
             $user = new User();
             $user->name = $data->username;
             $user->email = $data->mail;
@@ -122,6 +125,7 @@ class ImportFromLiveAPI extends Command
 
             //Create E-Mail Validation Objects
             $emailValidation = new EmailValidation();
+            $emailValidation->email = $user->email;
             $emailValidation->user_id = $user->id;
             $emailValidation->token = $data->mailCheckToken;
 
@@ -145,7 +149,7 @@ class ImportFromLiveAPI extends Command
             //Create last login
             $userLogin = new UserLogin();
             $userLogin->user_id = $user->id;
-            $userLogin->login = date("c", $data->lastLogin);
+            $userLogin->login = date("Y-m-d H:i:s", $data->lastLogin);
             $userLogin->saveOrFail();
         }
 
@@ -193,7 +197,7 @@ class ImportFromLiveAPI extends Command
             $userOrganisation->organisation_id = $organisation->id;
             $userOrganisation->access = $data->access;
             $userOrganisation->read = $data->read;
-            $userOrganisation->comment = $data->comment;
+            $userOrganisation->comment = (boolean)$data->comment;
             $userOrganisation->edit = $data->edit;
             $userOrganisation->protocol = $data->protocol;
             $userOrganisation->admin = $data->admin;

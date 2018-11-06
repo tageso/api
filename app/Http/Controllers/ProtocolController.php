@@ -86,6 +86,48 @@ class ProtocolController extends BaseController
         return $response->withData(new \App\Http\Resources\Protocol($protocol))->setStatusCode(201);
     }
 
+    public function getProtocolDetails($protocol_id)
+    {
+        $protocol = Protocol::query()->where("id", "=", $protocol_id)->first();
+        $organisation = Organisations::getById($protocol->organisation_id);
+
+        $categories = [];
+        $categoriesList = Categories::getForOrganisation($organisation->id, false);
+
+        //Get Categories for Date
+        foreach ($categoriesList as $category) {
+            $cat = Categories::getForDate($category->id, $protocol->ende);
+            if ($cat->status == "active") {
+                $categories[] = $cat;
+            }
+        }
+
+        usort($categories, [$this, 'sortByPosition']);
+
+        $items = Item::getAllForOrganisation($organisation->id);
+        foreach ($items as $itemData) {
+            $protocolItem = ProtocolItems::query()
+                ->where("item_id", "=", $itemData->id)
+                ->where("protocol_id", "=", $protocol->id)
+                ->first();
+            if ($protocolItem != null) {
+                $item = Item::getForDate($itemData->id, $protocol->ende);
+                $item->protocol = new ProtocolItem($protocolItem);
+                $itemsPerCat[$item->category_id][] = $item;
+            }
+        }
+
+        $resCategories = [];
+        foreach ($categories as $category) {
+            if (isset($itemsPerCat[$category->id])) {
+                usort($itemsPerCat[$category->id], [$this, 'sortByPosition']);
+                $category->items = $itemsPerCat[$category->id];
+                $resCategories[] = $category;
+            }
+        }
+
+        return $resCategories;
+    }
     public function getProtocolDeprecated($organisation_id, $protocol_id, Response $response)
     {
         $organisation = Organisations::getById($organisation_id);
@@ -110,41 +152,7 @@ class ProtocolController extends BaseController
             }
         }
 
-        $categories = [];
-        $categoriesList = Categories::getForOrganisation($organisation_id, false);
-
-        //Get Categories for Date
-        foreach ($categoriesList as $category) {
-            $cat = Categories::getForDate($category->id, $protocol->ende);
-            if ($cat->status == "active") {
-                $categories[] = $cat;
-            }
-        }
-
-        usort($categories, [$this, 'sortByPosition']);
-
-
-        $items = Item::getAllForOrganisation($organisation_id);
-        foreach ($items as $itemData) {
-            $protocolItem = ProtocolItems::query()
-                ->where("item_id", "=", $itemData->id)
-                ->where("protocol_id", "=", $protocol->id)
-                ->first();
-            if ($protocolItem != null) {
-                $item = Item::getForDate($itemData->id, $protocol->ende);
-                $item->protocol = new ProtocolItem($protocolItem);
-                $itemsPerCat[$item->category_id][] = $item;
-            }
-        }
-
-        $resCategories = [];
-        foreach ($categories as $category) {
-            if (isset($itemsPerCat[$category->id])) {
-                usort($itemsPerCat[$category->id], [$this, 'sortByPosition']);
-                $category->items = $itemsPerCat[$category->id];
-                $resCategories[] = $category;
-            }
-        }
+        $resCategories = $this->getProtocolDetails($protocol_id);
 
 
         $res["agenda"] = $organisation->id;
