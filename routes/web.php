@@ -20,6 +20,7 @@ $router->get("/v2/account/validation/{validation_id}/{token}", ["uses" => 'Accou
 $router->group(['prefix' => 'v2'], function () use ($router) {
     $router->group(['prefix' => 'account'], function () use ($router) {
         $router->get("/me", ["uses" => 'AccountController@getAccountMe']);
+        $router->get("/me/notification", ["uses" => 'NotificationController@listNotificationDeprecated']);
     });
     $router->group(['prefix' => 'profile'], function () use ($router) {
         $router->get("/me", ["uses" => 'AccountController@getAccountMe']);
