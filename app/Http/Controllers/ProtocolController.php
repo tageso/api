@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\ProtocolClosed;
 use App\Exceptions\HTTPException;
 use App\Exceptions\NotLoggedInException;
 use App\Http\Resources\ProtocolItem;
@@ -79,7 +80,7 @@ class ProtocolController extends BaseController
         $protocol->user_id = Auth::user()->id;
         $protocol->user_closed = null;
         $protocol->status = "open";
-        $protocol->start = date("Y-m-d H:i:s e");
+        $protocol->start = date("Y-m-d H:i:s");
         $protocol->ende = null;
         $protocol->saveOrFail();
 
@@ -158,7 +159,7 @@ class ProtocolController extends BaseController
         $res["agenda"] = $organisation->id;
         $d = new \DateTime($protocol->ende);
         $d->setTimezone(new \DateTimeZone('Europe/Berlin'));
-        $res["date"] = $d->format("d.m.Y H:i e");
+        $res["date"] = $d->format("d.m.Y H:i");
         $res["done"] = true;
         $res["canceld"] = false;
         try {
@@ -249,9 +250,12 @@ class ProtocolController extends BaseController
         }
 
         $protocol->status = "closed";
-        $protocol->ende = date("Y-m-d H:i:s e");
+        $protocol->ende = date("Y-m-d H:i:s");
         $protocol->user_closed = Auth::user()->id;
         $protocol->saveOrFail();
+
+        $event = new ProtocolClosed($protocol);
+        event($event);
 
         return $response;
     }
@@ -270,7 +274,7 @@ class ProtocolController extends BaseController
 
         $protocol = Protocol::getOpenProtocol($organisation_id);
         $protocol->status = "canceled";
-        $protocol->ende = date("Y-m-d H:i:s e");
+        $protocol->ende = date("Y-m-d H:i:s");
         $protocol->user_closed = Auth::user()->id;
         $protocol->saveOrFail();
     }

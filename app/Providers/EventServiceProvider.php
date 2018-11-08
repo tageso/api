@@ -34,8 +34,12 @@ class EventServiceProvider extends ServiceProvider
         'App\Events\NewsEvent' => [
             #'App\Listeners\NewsListener', # Dont use this now
             'App\Listeners\EventLogListener'
+        ],
+        'App\Events\ProtocolClosed' => [
+            'App\Listeners\CreateProtocolExportListener'
         ]
 
 
+        #
     ];
 }

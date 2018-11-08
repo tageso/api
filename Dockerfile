@@ -2,7 +2,7 @@ FROM alpine:3.8
 
 #Based on https://github.com/TrafeX/docker-php-nginx
 
-RUN apk add php7 php7-fpm php7-json php7-pdo php7-iconv php7-pdo_mysql nginx supervisor
+RUN apk add php7 php7-fpm php7-json php7-pdo php7-iconv php7-pdo_mysql php7-zip php7-mbstring php7-xml php7-dom php-xmlwriter php-simplexml nginx supervisor
 
 COPY docker/nginx.conf /etc/nginx/nginx.conf
 

@@ -70,6 +70,11 @@ $router->group(['prefix' => 'v2'], function () use ($router) {
                 $router->get("/deprecated", ["uses" => "AgendaController@getAgendProtocolDeprecated"]);
             });
             $router->get("/{protocol_id}/deprecated", ["uses" => 'ProtocolController@getProtocolDeprecated']);
+            $router->get("/{protocol_id}/export/pdf", ["uses" => 'ExportController@exportPDF']);
+            $router->get("/{protocol_id}/export/odt", ["uses" => 'ExportController@exportODT']);
+            $router->get("/{protocol_id}/export/docx", ["uses" => 'ExportController@exportDOCX']);
+
+
 
         });
     });

@@ -58,8 +58,6 @@ class ExportEverything extends Command
             if ($sync) {
                 $this->info("Syncron");
                 $job->onConnection("sync");
-            } else {
-                $job->onConnection("database");
             }
             dispatch($job);
             $this->info("PDF was created");
@@ -68,8 +66,6 @@ class ExportEverything extends Command
             if ($sync) {
                 $this->info("Syncron");
                 $job->onConnection("sync");
-            } else {
-                $job->onConnection("database");
             }
             dispatch($job);
             $this->info("Docx was created");
@@ -78,8 +74,6 @@ class ExportEverything extends Command
             if ($sync) {
                 $this->info("Syncron");
                 $job->onConnection("sync");
-            } else {
-                $job->onConnection("database");
             }
             dispatch($job);
             $this->info("ODT was created");

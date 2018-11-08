@@ -14,9 +14,10 @@
         "tageso/api-response": "*",
         "twig/twig": "^2.0",
         "vlucas/phpdotenv": "~2.2",
-        "phpoffice/phpword": "^0.15.0@dev",
+        "phpoffice/phpword": "v0.15.0",
         "dompdf/dompdf": "dev-master",
-        "aws/aws-sdk-php": "^3.0@dev"
+        "aws/aws-sdk-php": "^3.0@dev",
+        "viniciuswebdev/monolog-mattermost":" 1.0.0"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",

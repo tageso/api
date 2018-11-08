@@ -30,7 +30,7 @@ class SaveUserLoginListener
     {
         $userLogin = new UserLogin();
         $userLogin->user_id = $event->getUser()->id;
-        $userLogin->login = date("c");
+        $userLogin->login = date("Y-m-d H:i:s");
         $userLogin->save();
     }
 }

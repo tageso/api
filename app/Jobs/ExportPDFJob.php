@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Http\Controllers\ProtocolController;
 use App\Models\Organisations;
 use App\Models\Protocol;
+use Illuminate\Support\Facades\Log;
 use PHPMailer\PHPMailer\PHPMailer;
 
 class ExportPDFJob extends Job
@@ -43,6 +44,7 @@ class ExportPDFJob extends Job
      */
     public function handle(ProtocolController $protocolController, \Aws\S3\S3Client $s3)
     {
+        Log::info("Export PDF to S3 Job");
         //Check if file exist in s3
         if (!$s3->doesBucketExist(getenv("S3_Bucket"))) {
             $s3->createBucket(["Bucket"=>getenv("S3_Bucket")]);
@@ -81,11 +83,14 @@ class ExportPDFJob extends Job
         $objWriter = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord, "PDF");
         $objWriter->save($tmpfname);
 
+        Log::debug("Send File to S3");
         $insert = $s3->putObject([
             'Bucket' => getenv("S3_Bucket"),
             'Key'    => $protocol->id.".pdf",
             'Body'   => file_get_contents($tmpfname)
         ]);
+
+        Log::debug("PDF export to s3 done");
 
         unlink($tmpfname);
     }

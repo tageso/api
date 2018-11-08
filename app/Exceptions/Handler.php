@@ -4,6 +4,8 @@ namespace App\Exceptions;
 
 use Exception;
 use Illuminate\Http\Response;
+use Illuminate\Log\Logger;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -56,24 +58,32 @@ class Handler extends ExceptionHandler
         ];
 
         if (is_a($exception, \App\Exceptions\HTTPException::class)) {
+            Log::info("HTTP Exception");
             $response->setStatusCode($exception->getHttpCode());
             $data["httpCode"] = $exception->getHttpCode();
             $data["typ"] = "http";
         } elseif (is_a($exception, NotFoundHttpException::class)) {
+            Log::warning("API-Endpoint not found");
             $data["typ"] = "exception";
             $data["msg"] = "API Endpoint not found";
             $data["httpCode"] = 500;
         } elseif (is_a($exception, "Illuminate\Validation\ValidationException")) {
+            Log::info("Validation exception");
             $response->setStatusCode(400);
             $data["validation"] = $exception->errors();
             $data["httpCode"] = 400;
             $data["typ"] = "validation";
         } else {
+            Log::error("Unhandelt exception!");
+            $data["tech_msg"] = $data["msg"];
+            $data["msg"] = "Es ist ein interner Fehler aufgetreten, bitte informiere den Administrator";
             $data["typ"] = "exception";
             $data["exception"] = get_class($exception);
             $data["line"] = $exception->getLine();
             $data["file"] = $exception->getFile();
         }
+
+        $data["msg"] = $data["msg"] . "<br>Request-ID for Administrator: ".app()->requestid;
 
         /*if(is_a($exception, \App\Exceptions\DataMissingException::class)){
             $response->setStatusCode($exception->getHttpCode());

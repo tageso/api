@@ -212,7 +212,6 @@ class AgendaController extends Controller
 
     public function oldAgendaCall($id, Request $request, Response $response)
     {
-        Log::warning("Call depricated function");
         $organisation = Organisations::getById($id);
         if ($organisation == null) {
             throw new HTTPException("Organisation not found", 404);
