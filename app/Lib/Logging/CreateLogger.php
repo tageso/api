@@ -26,9 +26,6 @@ class CreateLogger
 
         $uidProcessor = new \Monolog\Processor\UidProcessor();
         $logger->pushProcessor($uidProcessor);
-        if(getenv("APP_ENV") != "testing") {
-            app()->requestid = $uidProcessor->getUid();
-        }
         $logger->pushProcessor(new IntrospectionProcessor(Logger::DEBUG, array('Illuminate\\')));
 
 

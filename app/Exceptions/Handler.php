@@ -83,16 +83,6 @@ class Handler extends ExceptionHandler
             $data["file"] = $exception->getFile();
         }
 
-        #$data["msg"] = $data["msg"] . "<br>Request-ID for Administrator: ".app()->requestid;
-
-        /*if(is_a($exception, \App\Exceptions\DataMissingException::class)){
-            $response->setStatusCode($exception->getHttpCode());
-            $data["httpCode"] = $exception->getHttpCode();
-            $data["typ"] = "dataMissing";
-            $data["techCode"] = $exception->techCode;
-            $data["missingInput"] = $exception->getMissingInputField();
-        }*/
-
 
         if ($request->header("accept") == "application/json") {
             $response->setContent(\GuzzleHttp\json_encode($data));
