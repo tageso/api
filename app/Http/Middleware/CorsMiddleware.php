@@ -24,6 +24,7 @@ class CorsMiddleware
             'Access-Control-Allow-Headers'     => 'Content-Type, Authorization, X-Requested-With'
         ];
 
+        $headers["X-Request-ID"] = app()->requestid;
         if ($request->isMethod('OPTIONS')) {
             Log::debug("OPTIONS Request");
             $response = response()->json('{"method":"OPTIONS"}', 200, $headers);

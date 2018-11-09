@@ -83,7 +83,7 @@ class Handler extends ExceptionHandler
             $data["file"] = $exception->getFile();
         }
 
-        $data["msg"] = $data["msg"] . "<br>Request-ID for Administrator: ".app()->requestid;
+        #$data["msg"] = $data["msg"] . "<br>Request-ID for Administrator: ".app()->requestid;
 
         /*if(is_a($exception, \App\Exceptions\DataMissingException::class)){
             $response->setStatusCode($exception->getHttpCode());
