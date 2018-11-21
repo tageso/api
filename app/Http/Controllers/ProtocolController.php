@@ -46,6 +46,7 @@ class ProtocolController extends BaseController
         $protocols = Protocol::query()
             ->where("organisation_id", "=", $organisation_id)
             ->whereIn("status", ["closed", "open"])
+            ->orderBy("id", "DESC")
             ->paginate(100);
 
 
