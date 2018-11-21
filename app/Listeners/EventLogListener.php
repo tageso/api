@@ -29,6 +29,12 @@ class EventLogListener
         Log::info("Log Event to MYSQL");
         $eventModel = new \App\Models\Event();
         $eventModel->eventType = get_class($event);
+
+        // @todo if just for migration from live
+        if($eventModel->eventType == "App\Events\NewsEvent") {
+            $eventModel->setCreatedAt(date("Y-m-d H:i:s", $event->getTimestamp()));
+        }
+
         if (method_exists($event, "getPayload")) {
             $eventModel->payload = \GuzzleHttp\json_encode($event->getPayload());
         } else {

@@ -33,6 +33,8 @@ class NewsListener
         $news->description = $event->getText();
         $news->link = $event->getLink();
         $news->setCreatedAt(date("Y-m-d H:i:s", $event->getTimestamp()));
+        echo date("Y-m-d H:i:s", $event->getTimestamp());
+        exit();
         $news->user_id = $event->getUser()->id;
         $news->saveOrFail();
     }
