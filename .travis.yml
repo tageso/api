@@ -15,4 +15,4 @@ deploy:
   on:
     branch: master
   provider: script
-    script: bash docker-release.sh
+  script: bash docker-release.sh
