@@ -31,7 +31,7 @@ class CreateLogger
 
         $streamHandler = new StreamHandler(storage_path('logs/lumen.log'), Logger::DEBUG);
         $streamHandler->setFormatter($formatter);
-        $logger->pushHandler($streamHandler);
+        #$logger->pushHandler($streamHandler);
         if (getenv("MATTERMOST_URL", false)) {
             $mattermostHandler = new MattermostHandler(
                 getenv("MATTERMOST_URL"),
