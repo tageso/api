@@ -31,7 +31,7 @@ class EventLogListener
         $eventModel->eventType = get_class($event);
 
         // @todo if just for migration from live
-        if($eventModel->eventType == "App\Events\NewsEvent") {
+        if ($eventModel->eventType == "App\Events\NewsEvent") {
             $eventModel->setCreatedAt(date("Y-m-d H:i:s", $event->getTimestamp()));
         }
 
