@@ -21,6 +21,7 @@ class NotificationController extends BaseController
         $events = Event::query()
             ->where("eventObjectId", "=", Auth::user()->id)
             ->where("eventType", "=", "App\Events\NewsEvent")
+            ->orderBy("created_at", "DESC")
             ->paginate(20);
 
         $eventList = [];
