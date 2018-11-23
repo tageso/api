@@ -5,7 +5,7 @@ rm -r -f vendor
 composer install --no-dev
 
 cd docs
-pip install 'requests[security]'
+pip install --upgrade pip
 pip install mkdocs
 pip install mkdocs-material
 mkdocs build
