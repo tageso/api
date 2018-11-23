@@ -5,3 +5,4 @@ rm -r -f vendor
 composer install --no-dev
 docker build -t tageso/api .
 docker push tageso/api
+rm -r -f vendor
