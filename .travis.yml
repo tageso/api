@@ -2,8 +2,12 @@ language: php
 sudo: required
 php:
   - 7.2
-python:
-  - 3.4
+
+addons:
+  apt:
+    packages:
+    - "python3"
+    - "python3-pip"
 
 services:
   - docker
