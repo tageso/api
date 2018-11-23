@@ -20,7 +20,7 @@ fi
 
 echo "Start Release in 10 Secounds";
 sleep 10
-exit
+
 # Update Version
 currentDate=`date +%d.%m.%Y`
 
