@@ -41,5 +41,8 @@ git rm -r -f VERSION
 git commit -a -m "Remove Versions File for next Development"
 git push origin master
 
+docker build -t tageso/api:$1 .
+docker push tageso/api:$1
+
 echo "Release Done"
 
