@@ -5,9 +5,9 @@ rm -r -f vendor
 composer install --no-dev
 
 cd docs
-sudo pip install --upgrade pip
-sudo pip install mkdocs
-sudo pip install mkdocs-material
+sudo apt-get install python3 python3-pip
+sudo pip3 install mkdocs
+sudo pip3 install mkdocs-material
 mkdocs build
 
 cd ..
