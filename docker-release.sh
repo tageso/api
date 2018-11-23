@@ -5,7 +5,7 @@ rm -r -f vendor
 composer install --no-dev
 
 cd docs
-sudo apt-get install python3 python3-pip
+sudo apt-get install python3
 sudo pip3 install mkdocs
 sudo pip3 install mkdocs-material
 mkdocs build
