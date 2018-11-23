@@ -2,11 +2,13 @@
 
 echo Version: $1
 
-docCheck=`grep "^# 2.0.0$" docs/docs/version.md | wc -l`
+docCheck=`grep "^## $1$" docs/docs/version.md | wc -l`
 if [ $docCheck -eq 0 ]
 then
     echo "Version not in docs/docs/version.md"
     exit
+else
+    echo "Version found in docs/docs/version.md"
 fi
 
 gitCheck=`git diff | wc -l`
@@ -22,7 +24,7 @@ exit
 # Update Version
 currentDate=`date +%d.%m.%Y`
 
-sed -i "s/# $1/# $1 ($currentDate)/" docs/docs/version.md
+sed -i "s/## $1/## $1 ($currentDate)/" docs/docs/version.md
 
 rm -r -v VERSION
 echo $1 > VERSION
