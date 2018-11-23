@@ -5,9 +5,9 @@ rm -r -f vendor
 composer install --no-dev
 
 cd docs
-pip install --upgrade pip
-pip install mkdocs
-pip install mkdocs-material
+sudo pip install --upgrade pip
+sudo pip install mkdocs
+sudo pip install mkdocs-material
 mkdocs build
 
 cd ..
