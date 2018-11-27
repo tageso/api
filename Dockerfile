@@ -19,6 +19,7 @@ RUN mkdir -p /var/www/html
 ADD ./ /var/www/html
 
 RUN chmod uog+rwx /var/www/html/storage/logs/
+RUN rm -r -f /var/www/html/storage/logs/*
 
 EXPOSE 80 443
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
