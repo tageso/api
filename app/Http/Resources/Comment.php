@@ -6,7 +6,7 @@ use App\Models\Categories;
 use App\Models\Organisations;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class ProtocolItem extends JsonResource
+class Comment extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -19,17 +19,15 @@ class ProtocolItem extends JsonResource
         $res = [
             'id' => $this->id,
             'agendaItem' => $this->item_id,
-            'description' => $this->description,
+            'text' => $this->text,
             'user' => $this->user_id,
-            'protocol' => $this->protocol_id,
-            'markedAsClosed' => $this->markedAsClosed,
 
             //Depricated
             '_id' => $this->id,
-            'text' => $this->description,
+
             'autor' => $this->user_id,
-            'close' => $this->markedAsClosed,
-            'protocolDateString' => $this->getDate()
+            'accountCallName' => \App\Models\UserProfile::query()->where("user_id", "=", $this->user_id)->first()->username,
+            'dateString' => $this->getDate()
         ];
         return $res;
     }

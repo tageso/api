@@ -55,4 +55,8 @@ class ProtocolItems extends Model
 
         return $item;
     }
+    public function getDate() {
+        $protocol = Protocol::query()->where("id", "=", $this->protocol_id)->first();
+        return $protocol->ende;
+    }
 }

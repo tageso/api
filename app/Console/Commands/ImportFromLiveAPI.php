@@ -69,6 +69,11 @@ class ImportFromLiveAPI extends Command
             $user->password = hash("sha512", "system");
             $user->saveOrFail();
 
+            $userProfile = new UserProfile();
+            $userProfile->username = "System";
+            $userProfile->user_id = $user->id;
+            $userProfile->saveOrFail();
+
             $user = new User();
             $user->name = "codeception";
             $user->email = "codeception@tageso.de";

@@ -7,9 +7,28 @@ This is the secound Version of the Tageso API build with Lumen and MYSQL as Back
 
 This is still work in process.
 
-# Docker Image
+# Run Dev-Envirment
 
-This Project is available as Docker image at [Docker Hub](https://hub.docker.com/r/tageso/api/).
+## Requirmentes
+
+You need the following tools
+
+* composer
+* docker
+* docker-compose
+
+Copy the .env.example to .env and change it
+
+```
+composer install
+docker-compose up
+```
+
+You can go into the docker-container by calling
+
+```
+docker-compose exec php /bin/sh
+```
 
 # Setup
 
