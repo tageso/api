@@ -26,7 +26,10 @@ class Comment extends JsonResource
             '_id' => $this->id,
 
             'autor' => $this->user_id,
-            'accountCallName' => \App\Models\UserProfile::query()->where("user_id", "=", $this->user_id)->first()->username,
+            'accountCallName' => \App\Models\UserProfile::query()
+                ->where("user_id", "=", $this->user_id)
+                ->first()
+                ->username,
             'dateString' => $this->getDate()
         ];
         return $res;

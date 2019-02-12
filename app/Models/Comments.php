@@ -38,7 +38,8 @@ class Comments extends Model
 
     ];
 
-    public function getDate() {
+    public function getDate()
+    {
         return $this->created_at->format("Y-m-d H:i:s");
     }
 }

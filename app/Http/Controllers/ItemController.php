@@ -203,18 +203,18 @@ class ItemController extends BaseController
         $comments = Comments::query()->where("item_id", "=", $item_id)->get();
 
         $history = [];
-        foreach($protocolItems as $i) {
+        foreach ($protocolItems as $i) {
             $history[] = $i;
         }
-        foreach($comments as $i) {
+        foreach ($comments as $i) {
             $history[] = $i;
         }
 
         uasort($history, [$this, "sortHistory"]);
 
         $historyResponse = [];
-        foreach($history as $i) {
-            if(get_class($i)=="App\Models\ProtocolItems") {
+        foreach ($history as $i) {
+            if (get_class($i)=="App\Models\ProtocolItems") {
                 $historyResponse[] = new ProtocolItem($i);
             } else {
                 $historyResponse[] = new Comment($i);
@@ -232,7 +232,8 @@ class ItemController extends BaseController
         return $response->withData($data);
     }
 
-    private function sortHistory($a, $b) {
+    private function sortHistory($a, $b)
+    {
         if ($a->getDate() == $b->getDate()) {
             return 0;
         }
