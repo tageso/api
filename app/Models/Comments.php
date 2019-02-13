@@ -37,4 +37,9 @@ class Comments extends Model
     protected $hidden = [
 
     ];
+
+    public function getDate()
+    {
+        return $this->created_at->format("Y-m-d H:i:s");
+    }
 }

@@ -7,11 +7,16 @@ use App\Exceptions\HTTPException;
 use App\Exceptions\NotLoggedInException;
 use App\Http\Resources\Access;
 use App\Http\Resources\Category;
+use App\Http\Resources\Comment;
 use App\Http\Resources\Organisation;
+use App\Http\Resources\Protocol;
+use App\Http\Resources\ProtocolItem;
 use App\Http\Resources\UserProfile;
 use App\Models\Categories;
+use App\Models\Comments;
 use App\Models\Item;
 use App\Models\Organisations;
+use App\Models\ProtocolItems;
 use App\Models\User;
 use App\Models\UserOrganisations;
 use App\Models\Users;
@@ -183,13 +188,37 @@ class ItemController extends BaseController
             }
         }
 
+
         $item = Item::query()->where("id", "=", $item_id)->first();
         $category = Categories::query()->where("id", "=", $item->category_id)->first();
         $agenda = Organisations::getById($category->organisation_id);
         $author = \App\Models\UserProfile::query()->where("user_id", "=", $item->user_id)->first();
         $access = UserOrganisations::guestAccess($organisation, null);
+
         if (Auth::check()) {
             $access = UserOrganisations::getAccess(Auth::user()->id, $organisation_id);
+        }
+
+        $protocolItems = ProtocolItems::query()->where("item_id", "=", $item_id)->get();
+        $comments = Comments::query()->where("item_id", "=", $item_id)->get();
+
+        $history = [];
+        foreach ($protocolItems as $i) {
+            $history[] = $i;
+        }
+        foreach ($comments as $i) {
+            $history[] = $i;
+        }
+
+        uasort($history, [$this, "sortHistory"]);
+
+        $historyResponse = [];
+        foreach ($history as $i) {
+            if (get_class($i)=="App\Models\ProtocolItems") {
+                $historyResponse[] = new ProtocolItem($i);
+            } else {
+                $historyResponse[] = new Comment($i);
+            }
         }
 
         $data = [];
@@ -198,8 +227,16 @@ class ItemController extends BaseController
         $data["agenda"] = new Organisation($agenda);
         $data["autor"] = new UserProfile($author);
         $data["access"] = new Access($access);
-        $data["history"] = [];
+        $data["history"] = $historyResponse;
 
         return $response->withData($data);
+    }
+
+    private function sortHistory($a, $b)
+    {
+        if ($a->getDate() == $b->getDate()) {
+            return 0;
+        }
+        return ($a->getDate() < $b->getDate()) ? -1 : 1;
     }
 }
