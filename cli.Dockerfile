@@ -8,4 +8,6 @@ RUN apk update \
     && docker-php-ext-configure zip --with-zlib-dir=/usr \
     && docker-php-ext-install zip
 
+ADD ./ /app
+
 CMD ["php", "/app/artisan", "queue:work", "-vvv"]
