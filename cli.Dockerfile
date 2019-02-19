@@ -10,4 +10,7 @@ RUN apk update \
 
 ADD ./ /app
 
+RUN rm -r -f /app/storage/logs/*
+RUN chmod uog+rwx /app/storage/logs
+
 CMD ["php", "/app/artisan", "queue:work", "-vvv"]
