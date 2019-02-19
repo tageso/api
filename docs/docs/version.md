@@ -1,5 +1,10 @@
 # Current
 
+## 2.0.0-RC2 (planed)
+
+* Change Docker-Container
+* Fix History Bug
+
 ## 2.0.0-RC1
 
 * *see 2.0.0*
